@@ -4,5 +4,7 @@ mod cli;
 pub use cli::Cli;
 
 fn main() {
-    println!("Hello, world!");
+    let cli = Cli::new();
+    
+    println!("{}", cli);
 }
