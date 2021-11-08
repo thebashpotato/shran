@@ -2,6 +2,7 @@
 name = "shran"
 version = "0.1.0"
 edition = "2018"
+description = "A command line tool for automating the process of building and deploying a Bitcoin node"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

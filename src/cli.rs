@@ -1,24 +1,30 @@
-use clap::{crate_authors, crate_name, crate_version, App, Arg, ArgMatches};
-use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
-//use std::path::Path;
+use crate::error::{ShranDynamicError, ShranError};
+use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg, ArgMatches};
+use std::path::Path;
 
 /// Wrapper around the clap command line interface library.
 ///
 /// # Example
 ///
 /// ```no_run
-///
+/// let cli = Cli::new().unwrap_or_else(|error: ShranError| {
+///     eprintln!("{}", error);
+///     std::process::exit(1);
+/// });
 /// ```
+#[derive(Debug)]
 pub struct Cli {
     build_file: Option<String>,
+    gen_config: bool,
+    with_token: Option<String>,
 }
 
-impl Cli {
-    pub fn new() -> Self {
+impl<'ebuf> Cli {
+    pub fn new() -> ShranDynamicError<'ebuf, Self> {
         let m = App::new(crate_name!())
             .author(crate_authors!())
             .version(crate_version!())
-            .about("A command line tool for building a customized or vanilla version of Bitcoin")
+            .about(crate_description!())
             .arg(
                 Arg::with_name("build-file")
                     .short("b")
@@ -28,38 +34,40 @@ impl Cli {
             )
             .get_matches();
 
-        let build_file: Option<String> = Self::check_build_file(&m);
+        let build_file = Self::validate_build_file(&m)?;
 
-        Self { build_file }
+        Ok(Self {
+            build_file,
+            gen_config: false,
+            with_token: None,
+        })
     }
 
     pub fn build_file(self) -> Option<String> {
         self.build_file
     }
 
-    fn check_build_file(arg_matches: &ArgMatches) -> Option<String> {
-        let mut file = None;
+    pub fn gen_config(self) -> bool {
+        self.gen_config
+    }
+
+    pub fn with_token(self) -> Option<String> {
+        self.with_token
+    }
+
+    fn validate_build_file(arg_matches: &ArgMatches) -> Result<Option<String>, ShranError<'ebuf>> {
+        let mut build_file: Option<String> = None;
         if arg_matches.is_present("build-file") {
-            file = Some(arg_matches.value_of("build-file").unwrap().to_owned());
+            let bfile = arg_matches.value_of("build-file").unwrap().to_owned();
+            if !Path::new(&bfile).exists() {
+                return Err(ShranError::BuildFileError {
+                    found: bfile.to_string(),
+                    file: file!(),
+                    line: line!(),
+                });
+            }
+            build_file = Some(bfile);
         }
-        file
-    }
-}
-
-impl Display for Cli {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        match &self.build_file {
-            Some(file) => write!(f, "Build file: {}", file),
-            None => write!(f, "Build file is empty"),
-        }
-    }
-}
-
-impl Debug for Cli {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        match &self.build_file {
-            Some(file) => write!(f, "Build file: {}", file),
-            None => write!(f, "Build file is empty"),
-        }
+        Ok(build_file)
     }
 }
