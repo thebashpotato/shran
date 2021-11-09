@@ -17,7 +17,7 @@
 
 ### :information_source: Automate Bitcoin builds, speed up deployment
 
-  Shran is an open-source cli tool being developed to address the needs of [DMG Blockchain Solutions](https://dmgblockchain.com/)
+  Shran is an open-source cli tool being developed to address the needs of [DMG Blockchain Solutions](https://dmgblockchain.com/).
   It supports build configurations through a yaml file. Customizing a Bitcoin node with
   your own .so libraries, while avoiding the need to deal directly with the automake build system
   is made extremely simple. It's so easy, your dev ops team with no C++ experience can carry out builds,
