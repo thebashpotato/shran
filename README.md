@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="442" height="320" src="assets/shran.png">
+  <img src="assets/shran.jpg">
   <br>
   <a href="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml">
     <img src="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml/badge.svg?branch=dev"/>
