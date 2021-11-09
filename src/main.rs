@@ -1,7 +1,9 @@
 mod cli;
+mod config;
 mod error;
 
 pub use cli::Cli;
+pub use config::{ShranDefault, ShranFile};
 pub use error::ShranError;
 
 fn main() {
@@ -11,6 +13,10 @@ fn main() {
     });
     match cli.build_file() {
         Some(file) => println!("Build file: {}", file),
-        None => println!("No build file was passed")
+        None => println!("No build file was passed"),
     }
+
+    println!("{}", ShranDefault::forfile(ShranFile::GhToken));
+    println!("{}", ShranDefault::forfile(ShranFile::BitcoinBuildLog));
+    println!("{}", ShranDefault::forfile(ShranFile::BitcoinBuildConfig));
 }

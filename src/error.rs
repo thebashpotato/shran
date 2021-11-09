@@ -10,4 +10,4 @@ pub enum ShranError<'ebuf> {
     },
 }
 
-pub type ShranDynamicError<'ebuf, T> = Result<T, ShranError<'ebuf>>;
+pub type ShranErrorType<'ebuf, T> = Result<T, ShranError<'ebuf>>;
