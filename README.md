@@ -13,6 +13,9 @@
   </a>
   <img alt="GitHub" src="https://img.shields.io/github/license/mattcoding4days/shran">
   <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/mattcoding4days/shran?color=pink&label=Repo%20Size&logo=github">
+  <img alt="GitHub issues" src="https://img.shields.io/github/issues/mattcoding4days/Shran?color=red">
+  <img alt="GitHub forks" src="https://img.shields.io/github/forks/mattcoding4days/Shran?style=social">
+  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mattcoding4days/Shran?style=social">
 </div>
 
 ### :information_source: Automate Bitcoin builds, speed up deployment
