@@ -7,6 +7,7 @@
     <img src="https://codecov.io/gh/mattcoding4days/Shran/branch/dev/graph/badge.svg?token=3VY7UYBZHN"/>
   </a>
   <img alt="GitHub" src="https://img.shields.io/github/license/mattcoding4days/shran">
+  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/mattcoding4days/shran?color=pink&label=Repo%20Size&logo=github">
 </div>
 
 <br>
