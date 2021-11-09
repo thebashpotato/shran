@@ -40,6 +40,8 @@ cargo test
 
 ### :superhero_man: Features
 
+> :warning: Shran is currently under heavy development
+
 #### Current planned features
 
   * [x] cli design
