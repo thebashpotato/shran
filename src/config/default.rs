@@ -16,7 +16,10 @@ impl<'a> ShranDefault {
 
     #[inline]
     pub fn config_dir() -> String {
-        format!("{}/.config/{}", env!("HOME"), Self::PROGNAME)
+        if let Ok(xdg) = env::var("XDG_CONFIG_HOME") {
+            return format!("{}/{}", xdg, Self::PROGNAME);
+        }
+        format!("{}/.config/{}", env::var("HOME").unwrap(), Self::PROGNAME)
     }
 
     #[inline]
@@ -65,7 +68,10 @@ mod tests {
             env!("CARGO_MANIFEST_DIR"),
             ShranDefault::BUILD_CONFIG_FILENAME
         );
-        assert_eq!(expected, ShranDefault::forfile(ShranFile::BitcoinBuildConfig))
+        assert_eq!(
+            expected,
+            ShranDefault::forfile(ShranFile::BitcoinBuildConfig)
+        )
     }
 
     #[test]
