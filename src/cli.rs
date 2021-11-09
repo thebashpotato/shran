@@ -61,7 +61,7 @@ impl<'ebuf> Cli {
             let bfile: String = arg_matches.value_of("build-file").unwrap().to_owned();
             if !Path::new(&bfile).exists() {
                 return Err(ShranError::BuildFileError {
-                    found: bfile.to_string(),
+                    found: bfile,
                     file: file!(),
                     line: line!(),
                 });

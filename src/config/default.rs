@@ -47,7 +47,7 @@ mod tests {
 
     #[test]
     fn test_build_dir() {
-        let expected: String = format!("{}", env!("CARGO_MANIFEST_DIR"));
+        let expected = String::from(env!("CARGO_MANIFEST_DIR"));
         assert_eq!(expected, ShranDefault::build_dir());
     }
 
