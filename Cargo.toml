@@ -1,6 +1,7 @@
 [package]
 name = "shran"
 version = "0.1.0"
+authors = ["Matt Williams matt@dmgblockchain.com"]
 edition = "2018"
 description = "A command line tool for automating the process of building and deploying a Bitcoin node"
 
