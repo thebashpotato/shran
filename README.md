@@ -16,4 +16,4 @@
   <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/mattcoding4days/shran?color=pink&label=Repo%20Size&logo=github">
 </div>
 
-> A cli tool to automate the building and deployment of Bitcoin nodes
+## :information_source: A command line tool for automating the building and deployment of a Bitoin node
