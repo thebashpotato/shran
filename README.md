@@ -5,7 +5,6 @@
 <br>
 
 <div align="center">
-  
   <a href="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml">
     <img src="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml/badge.svg?branch=dev"/>
   </a>
@@ -26,8 +25,46 @@
 
 ### :building_construction: Development
 
-  The tool is written in Rust
+  The tool is written in Rust, so compiling and testing is simple
+  
+```bash
+# Compile the source
+cargo build
 
+# Run the tests
+cargo test
+
+# Run the debug version
+./target/debug/shran --help
+```
+
+### :superhero_man: Features
+
+#### Current planned features
+
+  * [x] cli design
+  * [ ] Github Api integration
+  * [ ] Docker integration
+  * [ ] Github action integration
+  * [ ] Vanilla and Custom builds supported through a yaml file
+
+### :keyboard: Usage ( Not complete )
+
+```bash
+shran 0.1.0
+Matt Williams matt@dmgblockchain.com
+A command line tool for automating the process of building and deploying a Bitcoin node
+
+USAGE:
+    shran [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -b, --build-file <build-file>    Path to a `bitcoin-build.yaml` file
+```
 
 ### :scroll: Documentation ( Not complete )
 
