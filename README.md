@@ -1,5 +1,6 @@
 <div align="center">
-  <h1> Shran </h1>
+  <img width="442" height="320" src="assets/shran.png">
+  <br>
   <a href="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml">
     <img src="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml/badge.svg?branch=dev"/>
   </a>
@@ -9,7 +10,5 @@
   <img alt="GitHub" src="https://img.shields.io/github/license/mattcoding4days/shran">
   <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/mattcoding4days/shran?color=pink&label=Repo%20Size&logo=github">
 </div>
-
-<br>
 
 > A cli tool to automate the building and deployment of Bitcoin nodes
