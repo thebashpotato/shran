@@ -1,4 +1,4 @@
-use crate::error::{ShranDynamicError, ShranError};
+use crate::error::{ShranError, ShranErrorType};
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg, ArgMatches};
 use std::path::Path;
 
@@ -20,8 +20,8 @@ pub struct Cli {
 }
 
 impl<'ebuf> Cli {
-    pub fn new() -> ShranDynamicError<'ebuf, Self> {
-        let m = App::new(crate_name!())
+    pub fn new() -> ShranErrorType<'ebuf, Self> {
+        let m: ArgMatches = App::new(crate_name!())
             .author(crate_authors!())
             .version(crate_version!())
             .about(crate_description!())
@@ -30,11 +30,11 @@ impl<'ebuf> Cli {
                     .short("b")
                     .long("build-file")
                     .takes_value(true)
-                    .help("Path to a `shran-build.yaml` file"),
+                    .help("Path to a `bitcoin-build.yaml` file"),
             )
             .get_matches();
 
-        let build_file = Self::validate_build_file(&m)?;
+        let build_file: Option<String> = Self::validate_build_file(&m)?;
 
         Ok(Self {
             build_file,
@@ -55,10 +55,10 @@ impl<'ebuf> Cli {
         self.with_token
     }
 
-    fn validate_build_file(arg_matches: &ArgMatches) -> Result<Option<String>, ShranError<'ebuf>> {
+    fn validate_build_file(arg_matches: &ArgMatches) -> ShranErrorType<'ebuf, Option<String>> {
         let mut build_file: Option<String> = None;
         if arg_matches.is_present("build-file") {
-            let bfile = arg_matches.value_of("build-file").unwrap().to_owned();
+            let bfile: String = arg_matches.value_of("build-file").unwrap().to_owned();
             if !Path::new(&bfile).exists() {
                 return Err(ShranError::BuildFileError {
                     found: bfile.to_string(),
