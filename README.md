@@ -6,7 +6,7 @@
   <a href="https://codecov.io/gh/mattcoding4days/Shran">
     <img src="https://codecov.io/gh/mattcoding4days/Shran/branch/dev/graph/badge.svg?token=3VY7UYBZHN"/>
   </a>
-  <img alt="GitHub" src="https://img.shields.io/github/license/mattcoding4days/shran?style=plastic">
+  <img alt="GitHub" src="https://img.shields.io/github/license/mattcoding4days/shran">
 </div>
 
 <br>

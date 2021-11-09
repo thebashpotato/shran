@@ -1,4 +1,4 @@
-name: Shran-Test
+name: build/unittests
 
 on:
   push:
