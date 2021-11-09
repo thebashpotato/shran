@@ -26,7 +26,10 @@
 
 ### :building_construction: Development
 
+  The tool is written in Rust
 
 
-## :scroll: Documentation ( On going )
+### :scroll: Documentation ( Not complete )
 
+
+### :mage: Contributing ( Not complete )
