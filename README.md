@@ -1,7 +1,11 @@
 <div align="center">
   <img src="assets/shran.jpg">
+</div>
+
+<br>
+
+<div align="center">
   
-  <br>
   <a href="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml">
     <img src="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml/badge.svg?branch=dev"/>
   </a>
