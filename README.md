@@ -16,6 +16,7 @@
   <img alt="GitHub issues" src="https://img.shields.io/github/issues/mattcoding4days/Shran?color=red">
   <img alt="GitHub forks" src="https://img.shields.io/github/forks/mattcoding4days/Shran?style=social">
   <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mattcoding4days/Shran?style=social">
+  <img alt="Discord" src="https://img.shields.io/discord/909988908572491826?logo=discord">
 </div>
 
 ### :information_source: Automate Bitcoin builds, speed up deployment
