@@ -1,14 +1,14 @@
 [package]
 name = "shran"
 version = "0.1.0"
-authors = ["Matt Williams matt@dmgblockchain.com"]
+authors = ["Matt Williams matt.k.williams@protonmail.com"]
 edition = "2018"
 description = "A command line tool for automating the process of building and deploying a Bitcoin node"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = "2.33.3"
+clap = "3.0.10"
 ansi_term = "0.12.1"
 octocrab = "0.13.0"
 indicatif = "0.16.2"

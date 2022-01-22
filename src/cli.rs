@@ -1,6 +1,21 @@
 use crate::error::{ShranError, ShranErrorType};
-use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg, ArgMatches};
+use clap::{App, AppSettings, Arg, ArgMatches};
 use std::path::Path;
+
+#[derive(Debug)]
+pub struct ActiveCommand {
+    pub sub_command: String,
+    pub argument: String,
+}
+
+impl ActiveCommand {
+    pub fn new(sub_command: &str, argument: &str) -> Self {
+        Self {
+            sub_command: sub_command.to_string(),
+            argument: argument.to_string(),
+        }
+    }
+}
 
 /// Wrapper around the clap command line interface library.
 ///
@@ -14,60 +29,81 @@ use std::path::Path;
 /// ```
 #[derive(Debug)]
 pub struct Cli {
-    build_file: Option<String>,
-    gen_config: bool,
-    with_token: Option<String>,
+    active_command: ActiveCommand,
 }
 
-impl<'ebuf> Cli {
-    pub fn new() -> ShranErrorType<'ebuf, Self> {
-        let m: ArgMatches = App::new(crate_name!())
-            .author(crate_authors!())
-            .version(crate_version!())
-            .about(crate_description!())
-            .arg(
-                Arg::with_name("build-file")
-                    .short("b")
-                    .long("build-file")
-                    .takes_value(true)
-                    .help("Path to a `bitcoin-build.yaml` file"),
-            )
+impl<'e> Cli {
+    pub fn new() -> ShranErrorType<'e, Self> {
+        let m: ArgMatches = App::new("shran")
+            .author("Matt Williams matt.k.williams@protonmail.com")
+            .version("0.1.0")
+            .about("A command line tool for automating the process of building and deploying a Bitcoin node")
+            .setting(AppSettings::SubcommandRequiredElseHelp)
+            .subcommand(
+                App::new("generate")
+                    .setting(AppSettings::ArgRequiredElseHelp)
+                    .about("Generate a build configuration for a specified proof of work blockchain")
+                    .short_flag('G')
+                    .arg(
+                        Arg::new("bitcoin")
+                            .long("btc")
+                            .help("Generate a build.yaml configuration for the Bitcoin source code")
+                            .conflicts_with_all(&["litecoin"])
+                            .takes_value(false)
+                    )
+                    .arg(
+                        Arg::new("litecoin")
+                            .long("ltc")
+                            .help("Generate a build.yaml configuration for the Litecoin source code")
+                            .takes_value(false)
+                    )
+
+                )
+            .subcommand(
+                App::new("build")
+                    .setting(AppSettings::ArgRequiredElseHelp)
+                    .about("Execute a compilation strategy")
+                    .short_flag('B')
+                    .arg(
+                        Arg::new("config")
+                            .short('c')
+                            .long("config")
+                            .help("Path to a custom build.yaml configuration file")
+                            .takes_value(true)
+                    )
+                )
             .get_matches();
 
-        let build_file: Option<String> = Self::validate_build_file(&m)?;
+        let active_command: ActiveCommand = Self::get_active_command(&m)?;
 
-        Ok(Self {
-            build_file,
-            gen_config: false,
-            with_token: None,
-        })
+        Ok(Self { active_command })
     }
 
-    pub fn build_file(self) -> Option<String> {
-        self.build_file
+    pub fn active_command(&self) -> &ActiveCommand {
+        &self.active_command
     }
 
-    pub fn gen_config(self) -> bool {
-        self.gen_config
-    }
-
-    pub fn with_token(self) -> Option<String> {
-        self.with_token
-    }
-
-    fn validate_build_file(arg_matches: &ArgMatches) -> ShranErrorType<'ebuf, Option<String>> {
-        let mut build_file: Option<String> = None;
-        if arg_matches.is_present("build-file") {
-            let bfile: String = arg_matches.value_of("build-file").unwrap().to_owned();
-            if !Path::new(&bfile).exists() {
-                return Err(ShranError::BuildFileError {
-                    found: bfile,
-                    file: file!(),
-                    line: line!(),
-                });
+    fn get_active_command(matches: &ArgMatches) -> ShranErrorType<'e, ActiveCommand> {
+        match matches.subcommand() {
+            Some(("generate", generate_matches)) => {
+                if generate_matches.is_present("bitcoin") {
+                    Ok(ActiveCommand::new("generate", "bitcoin"))
+                } else {
+                    Ok(ActiveCommand::new("generate", "litecoin"))
+                }
             }
-            build_file = Some(bfile);
+            Some(("build", build_matches)) => {
+                let arg = build_matches.value_of("config").unwrap();
+                if !Path::new(&arg).exists() {
+                    return Err(ShranError::BuildFileError {
+                        msg: arg.to_string(),
+                        file: file!(),
+                        line: line!(),
+                    });
+                }
+                Ok(ActiveCommand::new("build", arg))
+            }
+            _ => unreachable!(),
         }
-        Ok(build_file)
     }
 }

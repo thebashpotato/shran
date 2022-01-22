@@ -1,13 +1,13 @@
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum ShranError<'ebuf> {
-    #[error("Error: {found:?} file does not exist\nFile: {file:?}\nLine: {line:?}")]
+pub enum ShranError<'e> {
+    #[error("Error: {msg:?} file does not exist\nFile: {file:?}\nLine: {line:?}")]
     BuildFileError {
-        found: String,
-        file: &'ebuf str,
+        msg: String,
+        file: &'e str,
         line: u32,
     },
 }
 
-pub type ShranErrorType<'ebuf, T> = Result<T, ShranError<'ebuf>>;
+pub type ShranErrorType<'e, T> = Result<T, ShranError<'e>>;
