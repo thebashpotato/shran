@@ -57,7 +57,6 @@ impl<'e> Cli {
                             .help("Generate a build.yaml configuration for the Litecoin source code")
                             .takes_value(false)
                     )
-
                 )
             .subcommand(
                 App::new("build")
@@ -65,10 +64,22 @@ impl<'e> Cli {
                     .about("Execute a compilation strategy")
                     .short_flag('B')
                     .arg(
-                        Arg::new("config")
-                            .short('c')
-                            .long("config")
-                            .help("Path to a custom build.yaml configuration file")
+                        Arg::new("strategy")
+                            .short('s')
+                            .long("strategy")
+                            .help("Path to a custom build.yaml strategy")
+                            .takes_value(true)
+                    )
+                )
+            .subcommand(
+                App::new("auth")
+                    .setting(AppSettings::ArgRequiredElseHelp)
+                    .about("Authorize shran access to a github via the api")
+                    .short_flag('A')
+                    .arg(
+                        Arg::new("token")
+                            .long("with-token")
+                            .help("The github token")
                             .takes_value(true)
                     )
                 )
@@ -93,7 +104,7 @@ impl<'e> Cli {
                 }
             }
             Some(("build", build_matches)) => {
-                let arg = build_matches.value_of("config").unwrap();
+                let arg = build_matches.value_of("strategy").unwrap();
                 if !Path::new(&arg).exists() {
                     return Err(ShranError::BuildFileError {
                         msg: arg.to_string(),
@@ -102,6 +113,10 @@ impl<'e> Cli {
                     });
                 }
                 Ok(ActiveCommand::new("build", arg))
+            }
+            Some(("auth", auth_matches)) => {
+                let arg = auth_matches.value_of("token").unwrap();
+                Ok(ActiveCommand::new("auth", arg))
             }
             _ => unreachable!(),
         }

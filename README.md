@@ -29,7 +29,7 @@
 ### :building_construction: Development
 
   The tool is written in Rust, so compiling and testing is simple, however it is built using the Rust nightly compiler,
-  currently rustc == 1.60.0
+  currently rustc == 1.60.0-nightly
   
 ```bash
 # Compile the source
@@ -50,7 +50,6 @@ cargo test
 
   * [x] cli design
   * [ ] Github Api integration
-  * [ ] Docker integration
   * [ ] Github action integration
   * [ ] Vanilla and Custom builds supported through a yaml file
 
@@ -58,18 +57,21 @@ cargo test
 
 ```bash
 shran 0.1.0
-Matt Williams matt@dmgblockchain.com
+Matt Williams matt.k.williams@protonmail.com
 A command line tool for automating the process of building and deploying a Bitcoin node
 
 USAGE:
-    shran [OPTIONS]
-
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    shran <SUBCOMMAND>
 
 OPTIONS:
-    -b, --build-file <build-file>    Path to a `bitcoin-build.yaml` file
+    -h, --help       Print help information
+    -V, --version    Print version information
+
+SUBCOMMANDS:
+    -A, auth        Authorize shran access to a github via the api
+    -B, build       Execute a compilation strategy
+    -G, generate    Generate a build configuration for a specified proof of work blockchain
+    help            Print this message or the help of the given subcommand(s)
 ```
 
 ### :scroll: Documentation ( Not complete )
