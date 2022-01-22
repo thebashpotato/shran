@@ -97,11 +97,13 @@ impl<'e> Cli {
     fn get_active_command(matches: &ArgMatches) -> ShranErrorType<'e, ActiveCommand> {
         match matches.subcommand() {
             Some(("generate", generate_matches)) => {
+                let active_arg: &str;
                 if generate_matches.is_present("bitcoin") {
-                    Ok(ActiveCommand::new("generate", "bitcoin"))
+                    active_arg = "bitcoin";
                 } else {
-                    Ok(ActiveCommand::new("generate", "litecoin"))
+                    active_arg = "litecoin";
                 }
+                Ok(ActiveCommand::new("generate", active_arg))
             }
             Some(("build", build_matches)) => {
                 let arg = build_matches.value_of("strategy").unwrap();
