@@ -28,7 +28,8 @@
 
 ### :building_construction: Development
 
-  The tool is written in Rust, so compiling and testing is simple
+  The tool is written in Rust, so compiling and testing is simple, however it is built using the Rust nightly compiler,
+  currently rustc == 1.60.0
   
 ```bash
 # Compile the source
