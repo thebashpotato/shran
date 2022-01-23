@@ -11,12 +11,9 @@ fn main() {
         eprintln!("{}", error);
         std::process::exit(1);
     });
-    match cli.build_file() {
-        Some(file) => println!("Build file: {}", file),
-        None => println!("No build file was passed"),
-    }
 
-    println!("{}", ShranDefault::forfile(ShranFile::GhToken));
-    println!("{}", ShranDefault::forfile(ShranFile::BitcoinBuildLog));
-    println!("{}", ShranDefault::forfile(ShranFile::BitcoinBuildConfig));
+    let ac = cli.active_command();
+
+    println!("Subcommand: {}", ac.sub_command());
+    println!("Argument: {}", ac.arg());
 }
