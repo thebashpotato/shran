@@ -12,6 +12,8 @@ fn main() {
         std::process::exit(1);
     });
 
-    println!("Subcommand: {}", cli.active_command().sub_command);
-    println!("Argument: {}", cli.active_command().argument);
+    let ac = cli.active_command();
+
+    println!("Subcommand: {}", ac.sub_command());
+    println!("Argument: {}", ac.arg());
 }

@@ -1,21 +1,7 @@
+use super::commands::{ActiveCommand, ArgName, SubCommandName};
 use crate::error::{ShranError, ShranErrorType};
 use clap::{App, AppSettings, Arg, ArgMatches};
 use std::path::Path;
-
-#[derive(Debug)]
-pub struct ActiveCommand {
-    pub sub_command: String,
-    pub argument: String,
-}
-
-impl ActiveCommand {
-    pub fn new(sub_command: &str, argument: &str) -> Self {
-        Self {
-            sub_command: sub_command.to_string(),
-            argument: argument.to_string(),
-        }
-    }
-}
 
 /// Wrapper around the clap command line interface library.
 ///
@@ -35,49 +21,49 @@ pub struct Cli {
 impl<'e> Cli {
     pub fn new() -> ShranErrorType<'e, Self> {
         let m: ArgMatches = App::new("shran")
-            .author("Matt Williams matt.k.williams@protonmail.com")
+            .author("matt.k.williams@protonmail.com")
             .version("0.1.0")
             .about("A command line tool for automating the process of building and deploying a Bitcoin node")
             .setting(AppSettings::SubcommandRequiredElseHelp)
             .subcommand(
-                App::new("generate")
+                App::new(SubCommandName::GENERATE)
                     .setting(AppSettings::ArgRequiredElseHelp)
                     .about("Generate a build configuration for a specified proof of work blockchain")
                     .short_flag('G')
                     .arg(
-                        Arg::new("bitcoin")
+                        Arg::new(ArgName::BITCOIN)
                             .long("btc")
                             .help("Generate a build.yaml configuration for the Bitcoin source code")
-                            .conflicts_with_all(&["litecoin"])
+                            .conflicts_with_all(&[ArgName::LITECOIN])
                             .takes_value(false)
                     )
                     .arg(
-                        Arg::new("litecoin")
+                        Arg::new(ArgName::LITECOIN)
                             .long("ltc")
                             .help("Generate a build.yaml configuration for the Litecoin source code")
                             .takes_value(false)
                     )
                 )
             .subcommand(
-                App::new("build")
+                App::new(SubCommandName::BUILD)
                     .setting(AppSettings::ArgRequiredElseHelp)
                     .about("Execute a compilation strategy")
                     .short_flag('B')
                     .arg(
-                        Arg::new("strategy")
+                        Arg::new(ArgName::STRATEGY)
                             .short('s')
-                            .long("strategy")
+                            .long("build-strategy")
                             .help("Path to a custom build.yaml strategy")
                             .takes_value(true)
                     )
                 )
             .subcommand(
-                App::new("auth")
+                App::new(SubCommandName::AUTH)
                     .setting(AppSettings::ArgRequiredElseHelp)
                     .about("Authorize shran access to a github via the api")
                     .short_flag('A')
                     .arg(
-                        Arg::new("token")
+                        Arg::new(ArgName::TOKEN)
                             .long("with-token")
                             .help("The github token")
                             .takes_value(true)
@@ -96,17 +82,17 @@ impl<'e> Cli {
 
     fn get_active_command(matches: &ArgMatches) -> ShranErrorType<'e, ActiveCommand> {
         match matches.subcommand() {
-            Some(("generate", generate_matches)) => {
+            Some((SubCommandName::GENERATE, generate_matches)) => {
                 let active_arg: &str;
-                if generate_matches.is_present("bitcoin") {
-                    active_arg = "bitcoin";
+                if generate_matches.is_present(ArgName::BITCOIN) {
+                    active_arg = ArgName::BITCOIN;
                 } else {
-                    active_arg = "litecoin";
+                    active_arg = ArgName::LITECOIN;
                 }
-                Ok(ActiveCommand::new("generate", active_arg))
+                Ok(ActiveCommand::new(SubCommandName::GENERATE, active_arg))
             }
-            Some(("build", build_matches)) => {
-                let arg = build_matches.value_of("strategy").unwrap();
+            Some((SubCommandName::BUILD, build_matches)) => {
+                let arg = build_matches.value_of(ArgName::STRATEGY).unwrap();
                 if !Path::new(&arg).exists() {
                     return Err(ShranError::BuildFileError {
                         msg: arg.to_string(),
@@ -114,11 +100,11 @@ impl<'e> Cli {
                         line: line!(),
                     });
                 }
-                Ok(ActiveCommand::new("build", arg))
+                Ok(ActiveCommand::new(SubCommandName::BUILD, arg))
             }
-            Some(("auth", auth_matches)) => {
-                let arg = auth_matches.value_of("token").unwrap();
-                Ok(ActiveCommand::new("auth", arg))
+            Some((SubCommandName::AUTH, auth_matches)) => {
+                let arg = auth_matches.value_of(ArgName::TOKEN).unwrap();
+                Ok(ActiveCommand::new(SubCommandName::AUTH, arg))
             }
             _ => unreachable!(),
         }
