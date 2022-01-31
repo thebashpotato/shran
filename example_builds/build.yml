@@ -1,0 +1,10 @@
+strategy: bitcoin
+
+build_args:
+  cxx_flags: ""
+  ld_flags: ""
+  dependencies:
+    wallet:
+      on: false
+      sqllite: false
+      bdb: false

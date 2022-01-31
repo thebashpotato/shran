@@ -11,8 +11,8 @@ pub struct ShranDefault;
 impl<'a> ShranDefault {
     pub const PROGNAME: &'a str = "shran";
     pub const GH_TOKEN_FILENAME: &'a str = "gh.yaml";
-    pub const BUILD_CONFIG_FILENAME: &'a str = "bitcoin-build.yaml";
-    pub const BUILD_LOG_FILENAME: &'a str = "bitcoin-build.log";
+    pub const BUILD_CONFIG_FILENAME: &'a str = "build.yaml";
+    pub const BUILD_LOG_FILENAME: &'a str = "build.log";
 
     #[inline]
     pub fn config_dir() -> String {
@@ -23,14 +23,24 @@ impl<'a> ShranDefault {
     }
 
     #[inline]
+    pub fn cache_dir() -> String {
+        format!("{}/.cache/{}", env::var("HOME").unwrap(), Self::PROGNAME)
+    }
+
+    #[inline]
     pub fn build_dir() -> String {
+        if let Ok(here) = env::current_dir() {
+            return String::from(here.to_str().unwrap());
+        }
         String::from(env::current_dir().unwrap().to_str().unwrap())
     }
 
     #[inline]
     pub fn forfile(file: ShranFile) -> String {
         match file {
-            ShranFile::GhToken => format!("{}/{}", Self::config_dir(), Self::GH_TOKEN_FILENAME),
+            ShranFile::GhToken => {
+                format!("{}/{}", Self::config_dir(), Self::GH_TOKEN_FILENAME)
+            }
             ShranFile::BitcoinBuildLog => {
                 format!("{}/{}", Self::build_dir(), Self::BUILD_LOG_FILENAME)
             }
@@ -78,5 +88,11 @@ mod tests {
     fn test_shran_config_dir() {
         let expected: String = format!("{}/.config/{}", env!("HOME"), ShranDefault::PROGNAME);
         assert_eq!(expected, ShranDefault::config_dir());
+    }
+
+    #[test]
+    fn test_shran_cache_dir() {
+        let expected: String = format!("{}/.cache/{}", env!("HOME"), ShranDefault::PROGNAME);
+        assert_eq!(expected, ShranDefault::cache_dir());
     }
 }
