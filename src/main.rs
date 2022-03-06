@@ -1,12 +1,12 @@
 mod cli;
 mod config;
 mod error;
-mod strategy;
+mod strategies;
 
 pub use cli::Cli;
 pub use config::{ShranDefault, ShranFile};
 pub use error::ShranError;
-pub use strategy::bitcoin::BuildStrategy;
+pub use strategies::bitcoin::BuildStrategy;
 
 fn main() {
     let cli = Cli::new().unwrap_or_else(|error: ShranError| {
@@ -19,5 +19,5 @@ fn main() {
     println!("Subcommand: {}", ac.sub_command());
     println!("Argument: {}", ac.arg());
 
-    let _ = strategy::bitcoin::BuildStrategy::new();
+    let _ = BuildStrategy::new();
 }
