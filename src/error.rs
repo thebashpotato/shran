@@ -8,6 +8,12 @@ pub enum ShranError<'e> {
         file: &'e str,
         line: u32,
     },
+    #[error("Error: {msg:?} Build option conflict\nFile: {file:?}\nLine: {line:?}")]
+    BuildStrategyError {
+        msg: String,
+        file: &'e str,
+        line: u32,
+    },
 }
 
 pub type ShranErrorType<'e, T> = Result<T, ShranError<'e>>;
