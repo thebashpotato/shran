@@ -1,3 +1,6 @@
+///! This module defines all command helpers
+
+/// All accepted subcommands that the shran cli accepts are
 #[derive(Debug)]
 pub struct SubCommandName;
 
@@ -7,6 +10,7 @@ impl<'c> SubCommandName {
     pub const AUTH: &'c str = "auth";
 }
 
+/// Each subcommand will have associated arguments that go with it
 pub struct ArgName;
 
 impl<'c> ArgName {
@@ -19,6 +23,7 @@ impl<'c> ArgName {
     pub const TOKEN: &'c str = "token";
 }
 
+/// Returns the user specified command and the argument that goes with it
 #[derive(Debug)]
 pub struct ActiveCommand {
     sub_command: String,

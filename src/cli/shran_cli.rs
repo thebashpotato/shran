@@ -1,11 +1,10 @@
 use super::commands::{ActiveCommand, ArgName, SubCommandName};
+use crate::config::default::ShranDefault;
 use crate::error::{ShranError, ShranErrorType};
 use clap::{App, AppSettings, Arg, ArgMatches};
 use std::path::Path;
 
 /// Wrapper around the clap command line interface library.
-///
-/// # Example
 ///
 /// ```no_run
 /// let cli = Cli::new().unwrap_or_else(|error: ShranError| {
@@ -20,7 +19,7 @@ pub struct Cli {
 
 impl<'e> Cli {
     pub fn new() -> ShranErrorType<'e, Self> {
-        let m: ArgMatches = App::new("shran")
+        let m: ArgMatches = App::new(ShranDefault::PROGNAME)
             .author("matt.k.williams@protonmail.com")
             .version("0.1.0")
             .about("A command line tool for automating the process of building and deploying a Bitcoin node")

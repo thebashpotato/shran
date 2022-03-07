@@ -8,8 +8,8 @@ pub enum ShranError<'e> {
         file: &'e str,
         line: u32,
     },
-    #[error("Error: {msg:?} Build option conflict\nFile: {file:?}\nLine: {line:?}")]
-    BuildStrategyError {
+    #[error("Error: {msg:?} does not match\nFile: {file:?}\nLine: {line:?}")]
+    UnrecognizedBuildOptionNameError {
         msg: String,
         file: &'e str,
         line: u32,
