@@ -1,7 +1,6 @@
 use super::commands::{ActiveCommand, ArgName, SubCommandName};
-use crate::config::default::ShranDefault;
 use crate::error::{ShranError, ShranErrorType};
-use clap::{App, AppSettings, Arg, ArgMatches};
+use clap::{crate_authors, crate_description, crate_name, crate_version, Arg, ArgMatches, Command};
 use std::path::Path;
 
 /// Wrapper around the clap command line interface library.
@@ -19,33 +18,37 @@ pub struct Cli {
 
 impl<'e> Cli {
     pub fn new() -> ShranErrorType<'e, Self> {
-        let m: ArgMatches = App::new(ShranDefault::PROGNAME)
-            .author("matt.k.williams@protonmail.com")
-            .version("0.1.0")
-            .about("A command line tool for automating the process of building and deploying a Bitcoin node")
-            .setting(AppSettings::SubcommandRequiredElseHelp)
+        let m: ArgMatches = Command::new(crate_name!())
+            .author(crate_authors!())
+            .version(crate_version!())
+            .about(crate_description!())
+            .subcommand_required(true)
             .subcommand(
-                App::new(SubCommandName::GENERATE)
-                    .setting(AppSettings::ArgRequiredElseHelp)
-                    .about("Generate a build configuration for a specified proof of work blockchain")
+                Command::new(SubCommandName::GENERATE)
+                    .arg_required_else_help(true)
+                    .about(
+                        "Generate a build configuration for a specified proof of work blockchain",
+                    )
                     .short_flag('G')
                     .arg(
                         Arg::new(ArgName::BITCOIN)
                             .long("btc")
                             .help("Generate a build.yaml configuration for the Bitcoin source code")
                             .conflicts_with_all(&[ArgName::LITECOIN])
-                            .takes_value(false)
+                            .takes_value(false),
                     )
                     .arg(
                         Arg::new(ArgName::LITECOIN)
                             .long("ltc")
-                            .help("Generate a build.yaml configuration for the Litecoin source code")
-                            .takes_value(false)
-                    )
-                )
+                            .help(
+                                "Generate a build.yaml configuration for the Litecoin source code",
+                            )
+                            .takes_value(false),
+                    ),
+            )
             .subcommand(
-                App::new(SubCommandName::BUILD)
-                    .setting(AppSettings::ArgRequiredElseHelp)
+                Command::new(SubCommandName::BUILD)
+                    .arg_required_else_help(true)
                     .about("Execute a compilation strategy")
                     .short_flag('B')
                     .arg(
@@ -53,21 +56,21 @@ impl<'e> Cli {
                             .short('s')
                             .long("build-strategy")
                             .help("Path to a custom build.yaml strategy")
-                            .takes_value(true)
-                    )
-                )
+                            .takes_value(true),
+                    ),
+            )
             .subcommand(
-                App::new(SubCommandName::AUTH)
-                    .setting(AppSettings::ArgRequiredElseHelp)
+                Command::new(SubCommandName::AUTH)
+                    .arg_required_else_help(true)
                     .about("Authorize shran access to a github via the api")
                     .short_flag('A')
                     .arg(
                         Arg::new(ArgName::TOKEN)
                             .long("with-token")
                             .help("The github token")
-                            .takes_value(true)
-                    )
-                )
+                            .takes_value(true),
+                    ),
+            )
             .get_matches();
 
         let active_command: ActiveCommand = Self::get_active_command(&m)?;

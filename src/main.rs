@@ -3,25 +3,41 @@ mod config;
 mod error;
 mod strategies;
 
+pub use cli::commands::{ActiveCommand, SubCommandName};
 pub use cli::Cli;
 pub use config::{ShranDefault, ShranFile};
 pub use error::ShranError;
 pub use strategies::bitcoin::{BuildStrategy, BuildOptionName, OptionEnabled};
 
+fn run_generate(node_type: &String) {
+    println!("Generating build for: {}", node_type);
+}
+
+fn run_build(path: &String) {
+    println!("Build file path {}", path);
+}
+
+fn run_auth(token: &String) {
+    println!("Running auth code {}", token);
+}
+
 fn main() {
-    let cli = Cli::new().unwrap_or_else(|error: ShranError| {
+    let cli: Cli = Cli::new().unwrap_or_else(|error: ShranError| {
         eprintln!("{}", error);
         std::process::exit(1);
     });
 
-    let ac = cli.active_command();
+    let ac: &ActiveCommand = cli.active_command();
 
-    println!("Subcommand: {}", ac.sub_command());
-    println!("Argument: {}", ac.arg());
+    if ac.sub_command() == SubCommandName::GENERATE {
+        run_generate(ac.arg());
+    }
 
-    let mut build = BuildStrategy::new();
-    if let Err(error) = build.update_build_option(BuildOptionName::WALLET, OptionEnabled::No) {
-        eprintln!("{}", error);
-        std::process::exit(1);
+    if ac.sub_command() == SubCommandName::BUILD {
+        run_build(ac.arg());
+    }
+
+    if ac.sub_command() == SubCommandName::AUTH {
+        run_auth(ac.arg());
     }
 }
