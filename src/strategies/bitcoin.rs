@@ -55,7 +55,7 @@ impl<'f> BuildOptionName {
 ///
 /// * `Yes`  Use the associated build option
 /// * `No`   Do not use the associated build option
-/// * `Auto` bitcoins build system figures it out, best to leave an option marked with alone.
+/// * `Auto` bitcoins build system figures it out, best to leave an option marked with this alone.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum OptionEnabled {
     Yes,
@@ -490,6 +490,7 @@ mod tests {
         let b = BuildStrategy::new();
         let build_opts = b.build_options();
         let build_options = build_opts.get(BuildOptionName::WALLET);
+
         assert_eq!(build_options.is_some(), true);
         let option = build_options.unwrap();
         assert_eq!(option.flag(), "--disable-wallet");
