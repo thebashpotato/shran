@@ -7,7 +7,9 @@ pub use cli::commands::{ActiveCommand, SubCommandName};
 pub use cli::Cli;
 pub use config::{ShranDefault, ShranFile};
 pub use error::ShranError;
-pub use strategies::bitcoin::{BuildStrategy, BuildOptionName, OptionEnabled};
+use octocrab::models::repos::Release;
+use octocrab::Octocrab;
+pub use strategies::bitcoin::{BuildOptionName, BuildStrategy, OptionEnabled};
 
 fn run_generate(node_type: &String) {
     println!("Generating build for: {}", node_type);
@@ -17,27 +19,53 @@ fn run_build(path: &String) {
     println!("Build file path {}", path);
 }
 
-fn run_auth(token: &String) {
-    println!("Running auth code {}", token);
+async fn run_auth(token: &String) -> octocrab::Result<()> {
+    println!("Fetching latest release");
+
+    // write some test octocrab code
+    let octo = Octocrab::builder()
+        .personal_token(token.to_owned())
+        .build()?;
+
+    let release: Release = octo
+        .repos("bitcoin", "bitcoin")
+        .releases()
+        .get_latest()
+        .await?;
+
+    println!("Release Author: {}", release.author.login);
+    println!("Tag: {}", release.tag_name);
+    println!("Assets Url: {}", release.assets_url);
+
+    if let Some(tar_url) = release.tarball_url {
+        println!("Download url: {}", tar_url);
+        println!("Scheme End: {}", tar_url.path());
+    }
+
+    Ok(())
 }
 
-fn main() {
-    let cli: Cli = Cli::new().unwrap_or_else(|error: ShranError| {
-        eprintln!("{}", error);
-        std::process::exit(1);
-    });
+#[tokio::main]
+async fn main() -> octocrab::Result<()> {
+    match Cli::new() {
+        Ok(cli) => {
+            let ac: &ActiveCommand = cli.active_command();
 
-    let ac: &ActiveCommand = cli.active_command();
+            if ac.sub_command() == SubCommandName::GENERATE {
+                run_generate(ac.arg());
+            }
 
-    if ac.sub_command() == SubCommandName::GENERATE {
-        run_generate(ac.arg());
+            if ac.sub_command() == SubCommandName::BUILD {
+                run_build(ac.arg());
+            }
+
+            if ac.sub_command() == SubCommandName::AUTH {
+                run_auth(ac.arg()).await?;
+            }
+        }
+        Err(e) => {
+            eprintln!("{}", e);
+        }
     }
-
-    if ac.sub_command() == SubCommandName::BUILD {
-        run_build(ac.arg());
-    }
-
-    if ac.sub_command() == SubCommandName::AUTH {
-        run_auth(ac.arg());
-    }
+    Ok(())
 }
