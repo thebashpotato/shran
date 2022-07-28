@@ -53,6 +53,7 @@ impl<'f> BuildOptionName {
 /// Bitcoin controls compile flags with these three values,
 /// so I mimic them here with an Enum
 ///
+/// # Example
 /// * `Yes`  Use the associated build option
 /// * `No`   Do not use the associated build option
 /// * `Auto` bitcoins build system figures it out, best to leave an option marked with this alone.
@@ -68,7 +69,8 @@ pub enum OptionEnabled {
 /// in compiling in only the functionality they need, giving faster build times in ci/cd pipelines,
 /// a smaller binary foot print etc.
 ///
-/// For example if an entity needs a bitcoin node just for rpc call purposes,
+/// # Example
+/// If an entity needs a bitcoin node just for rpc call purposes,
 /// they would want to disable the wallet, sqlite and bdb flags, as that is unecessary.
 ///
 /// * `flag` the command line parameter to be passed to the auto tools configure script
@@ -457,6 +459,8 @@ impl<'f, 'e> BuildStrategy<'f> {
     ///
     /// * `build_option` Should use the BuildOptionName struct
     /// * `enable_option`
+    ///
+    /// # Example
     ///
     /// ```no_run
     /// if let Err(error) = build.update_build_option(BuildOptionName::WALLET, &OptionEnabled::No) {

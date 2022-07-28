@@ -8,6 +8,7 @@ description = "A command line tool for automating the process of building and de
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chrono = "0.4"
 curl = "0.4.44"
 tokio = { version = "1.20.1", features = ["full"] }
 clap = { version = "3.2.6", features = ["cargo", "wrap_help"] }

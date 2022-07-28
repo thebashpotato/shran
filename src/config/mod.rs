@@ -1,3 +1,3 @@
-pub use default::{ShranFile, ShranDefault};
+pub use default::{ShranDefault, ShranFile};
 
 pub mod default;

@@ -5,11 +5,14 @@ use std::path::Path;
 
 /// Wrapper around the clap command line interface library.
 ///
+/// # Example
 /// ```no_run
-/// let cli = Cli::new().unwrap_or_else(|error: ShranError| {
-///     eprintln!("{}", error);
-///     std::process::exit(1);
-/// });
+/// match Cli::new() {
+///     Ok(cli) => {
+///         ...
+///     },
+///     Err(e) => eprintln!("{}", e);
+/// }
 /// ```
 #[derive(Debug)]
 pub struct Cli {
