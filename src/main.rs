@@ -8,7 +8,7 @@ pub use cli::commands::{ActiveCommand, SubCommandName};
 pub use cli::Cli;
 pub use config::{ShranDefault, ShranFile};
 pub use error::ShranError;
-pub use github::releases::{GitRelease, GithubClient};
+pub use github::{GitRelease, GithubClient};
 use std::process::ExitCode;
 pub use strategies::bitcoin::{BuildOptionName, BuildStrategy, OptionEnabled};
 

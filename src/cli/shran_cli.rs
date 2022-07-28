@@ -104,6 +104,7 @@ impl<'e> Cli {
                         msg: arg.to_string(),
                         file: file!(),
                         line: line!(),
+                        column: column!(),
                     }));
                 }
                 Ok(ActiveCommand::new(SubCommandName::BUILD, arg))

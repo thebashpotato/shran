@@ -482,6 +482,7 @@ impl<'f, 'e> BuildStrategy<'f> {
             msg: build_option_name.to_string(),
             file: file!(),
             line: line!(),
+            column: column!(),
         }))
     }
 }
