@@ -1,6 +1,7 @@
 use super::commands::{ActiveCommand, ArgName, SubCommandName};
-use crate::error::{ShranError, ShranErrorType};
+use crate::error::ShranError;
 use clap::{crate_authors, crate_description, crate_name, crate_version, Arg, ArgMatches, Command};
+use std::error::Error;
 use std::path::Path;
 
 /// Wrapper around the clap command line interface library.
@@ -20,7 +21,7 @@ pub struct Cli {
 }
 
 impl<'e> Cli {
-    pub fn new() -> ShranErrorType<'e, Self> {
+    pub fn new() -> Result<Self, Box<dyn Error>> {
         let m: ArgMatches = Command::new(crate_name!())
             .author(crate_authors!())
             .version(crate_version!())
@@ -85,7 +86,7 @@ impl<'e> Cli {
         &self.active_command
     }
 
-    fn get_active_command(matches: &ArgMatches) -> ShranErrorType<'e, ActiveCommand> {
+    fn get_active_command(matches: &ArgMatches) -> Result<ActiveCommand, Box<dyn Error>> {
         match matches.subcommand() {
             Some((SubCommandName::GENERATE, generate_matches)) => {
                 let active_arg: &str;
@@ -99,11 +100,11 @@ impl<'e> Cli {
             Some((SubCommandName::BUILD, build_matches)) => {
                 let arg = build_matches.value_of(ArgName::STRATEGY).unwrap();
                 if !Path::new(&arg).exists() {
-                    return Err(ShranError::BuildFileError {
+                    return Err(Box::new(ShranError::BuildFileError {
                         msg: arg.to_string(),
                         file: file!(),
                         line: line!(),
-                    });
+                    }));
                 }
                 Ok(ActiveCommand::new(SubCommandName::BUILD, arg))
             }

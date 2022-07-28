@@ -9,6 +9,7 @@ pub use cli::Cli;
 pub use config::{ShranDefault, ShranFile};
 pub use error::ShranError;
 pub use github::releases::{GitRelease, GithubClient};
+use std::process::ExitCode;
 pub use strategies::bitcoin::{BuildOptionName, BuildStrategy, OptionEnabled};
 
 fn run_generate(node_type: &String) {
@@ -19,11 +20,18 @@ fn run_build(path: &String) {
     println!("Build file path {}", path);
 }
 
-//async fn run_get_latest(token: String) -> Result<GitRelease, Box<dyn std::error::Error>> {
-//let gclient = GithubClient::new(token)?;
-//let release: GitRelease = gclient.get_latest_release().await?;
-//Ok(release)
-//}
+async fn run_get_latest(token: String) -> Result<GitRelease, Box<dyn std::error::Error>> {
+    let gclient = GithubClient::new(token)?;
+    let release: GitRelease = gclient.get_latest_release().await?;
+    Ok(release)
+}
+
+async fn run_get_tagged_release(token: String) -> Result<GitRelease, Box<dyn std::error::Error>> {
+    let gclient = GithubClient::new(token)?;
+    let tag = String::from("v0.21.0");
+    let release: GitRelease = gclient.get_tagged_release(&tag).await?;
+    Ok(release)
+}
 
 async fn run_get_all_available_tags(token: String) -> Result<(), Box<dyn std::error::Error>> {
     let gclient = GithubClient::new(token)?;
@@ -35,24 +43,37 @@ async fn run_get_all_available_tags(token: String) -> Result<(), Box<dyn std::er
 }
 
 #[tokio::main]
-async fn main() -> octocrab::Result<(), Box<dyn std::error::Error>> {
-    let cli = Cli::new().expect("Cli constructor failure");
-    let ac: &ActiveCommand = cli.active_command();
+async fn main() -> ExitCode {
+    match Cli::new() {
+        Ok(cli) => {
+            let ac: &ActiveCommand = cli.active_command();
 
-    if ac.sub_command() == SubCommandName::GENERATE {
-        run_generate(ac.arg());
-    }
+            if ac.sub_command() == SubCommandName::GENERATE {
+                run_generate(ac.arg());
+            }
 
-    if ac.sub_command() == SubCommandName::BUILD {
-        run_build(ac.arg());
-    }
+            if ac.sub_command() == SubCommandName::BUILD {
+                run_build(ac.arg());
+            }
 
-    if ac.sub_command() == SubCommandName::AUTH {
-        run_get_all_available_tags(ac.arg().to_owned()).await?
-        //let release: GitRelease = run_auth(ac.arg().to_owned()).await?;
-        //println!("Author: {}", release.author);
-        //println!("Tag: {}", release.tag_name);
-        //println!("Release branch: {}", release.release_branch);
+            if ac.sub_command() == SubCommandName::AUTH {
+                match run_get_tagged_release(ac.arg().to_owned()).await {
+                    Ok(release) => {
+                        println!("Author: {}", release.author);
+                        println!("Tag: {}", release.tag_name);
+                        println!("Release branch: {}", release.release_branch);
+                    }
+                    Err(e) => {
+                        eprintln!("{}", e);
+                        return ExitCode::FAILURE;
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("{}", e);
+            return ExitCode::FAILURE;
+        }
     }
-    Ok(())
+    ExitCode::SUCCESS
 }

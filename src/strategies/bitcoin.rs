@@ -1,7 +1,8 @@
 //! Defualt build strategy structures for Bitcoin
 
-use crate::error::{ShranError, ShranErrorType};
+use crate::error::ShranError;
 use std::collections::HashMap;
+use std::error::Error;
 
 /// Hardcoded build option names from bitcoins configure.ac file
 /// https://github.com/bitcoin/bitcoin/blob/v22.0/configure.ac
@@ -472,16 +473,16 @@ impl<'f, 'e> BuildStrategy<'f> {
         &mut self,
         build_option_name: &str,
         enable_option: OptionEnabled,
-    ) -> ShranErrorType<'e, ()> {
+    ) -> Result<(), Box<dyn Error>> {
         if let Some(value) = self.build_options.get_mut(build_option_name) {
             value.update_enabled(enable_option);
             return Ok(());
         }
-        Err(ShranError::UnrecognizedBuildOptionNameError {
+        Err(Box::new(ShranError::UnrecognizedBuildOptionNameError {
             msg: build_option_name.to_string(),
             file: file!(),
             line: line!(),
-        })
+        }))
     }
 }
 

@@ -15,5 +15,3 @@ pub enum ShranError<'e> {
         line: u32,
     },
 }
-
-pub type ShranErrorType<'e, T> = Result<T, ShranError<'e>>;

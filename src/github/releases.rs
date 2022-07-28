@@ -1,15 +1,16 @@
 use crate::config::ShranDefault;
 use chrono::{DateTime, Utc};
 use curl::easy::Easy;
-use octocrab::models::repos::Tag;
+use octocrab::models::repos::{Release, Tag};
 use octocrab::{Octocrab, Page};
+use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 
 /// Reprents all necessary information about a github repositories
 /// release information, most of this information is taken from
 /// the similar but much larger octocrab Release struct
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct GitRelease {
     pub author: String,
     pub tag_name: String,
@@ -38,7 +39,7 @@ impl GithubClient {
     fn download_release(mut self, url: &String, file_name: String) -> std::io::Result<()> {
         let mut dst: Vec<u8> = Vec::new();
         self.easy.url(url)?;
-        let _redirect = self.easy.follow_location(true);
+        self.easy.follow_location(true)?;
 
         {
             let mut transfer = self.easy.transfer();
@@ -56,22 +57,7 @@ impl GithubClient {
         Ok(())
     }
 
-    /// Download the latest release from github
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// let gclient = GithubClient::new(token)?;
-    /// let release: GitRelease = gclient.get_latest_release().await?;
-    /// ```
-    pub async fn get_latest_release(self) -> Result<GitRelease, Box<dyn std::error::Error>> {
-        let release = self
-            .octocrab
-            .repos("bitcoin", "bitcoin")
-            .releases()
-            .get_latest()
-            .await?;
-
+    fn release_helper(self, release: Release) -> Result<GitRelease, Box<dyn Error>> {
         let url = format!(
             "{}/{}{}",
             ShranDefault::BITCOIN_BASE_URL,
@@ -91,6 +77,45 @@ impl GithubClient {
         })
     }
 
+    /// Download the latest release from github
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// let gclient = GithubClient::new(token)?;
+    /// let release: GitRelease = gclient.get_latest_release().await?;
+    /// ```
+    pub async fn get_latest_release(self) -> Result<GitRelease, Box<dyn Error>> {
+        let release: Release = self
+            .octocrab
+            .repos("bitcoin", "bitcoin")
+            .releases()
+            .get_latest()
+            .await?;
+
+        self.release_helper(release)
+    }
+
+    /// Download a release specified by a tag
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// let gclient = GithubClient::new(token)?;
+    /// let tag = String::from("v23.0");
+    /// let release: GitRelease = gclient.get_tagged_release(&tag).await?;
+    /// ```
+    pub async fn get_tagged_release(self, tag: &String) -> Result<GitRelease, Box<dyn Error>> {
+        let release: Release = self
+            .octocrab
+            .repos("bitcoin", "bitcoin")
+            .releases()
+            .get_by_tag(tag)
+            .await?;
+
+        self.release_helper(release)
+    }
+
     /// Fetches all available tags (releases) from bitcoins repository
     ///
     /// # Example
@@ -101,7 +126,7 @@ impl GithubClient {
     ///    println!("{}", tag);
     /// }
     /// ```
-    pub async fn get_all_tags(self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    pub async fn get_all_tags(self) -> Result<Vec<String>, Box<dyn Error>> {
         let mut current_page: Page<Tag> = self
             .octocrab
             .repos("bitcoin", "bitcoin")
