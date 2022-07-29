@@ -68,7 +68,7 @@ impl GithubClient {
             transfer.perform()?;
         }
         {
-            // TODO: Build a file system manager struct
+            // TODO: User FileSystemManager struct here
             let mut file = File::create(file_name)?;
             file.write_all(dst.as_slice())?;
         }
@@ -83,7 +83,6 @@ impl GithubClient {
             ShranDefault::FILE_EXTENSION
         );
 
-        // TODO: Replace the '.' in release.tag_name with '-'
         let file_name = format!("{}{}", release.tag_name, ShranDefault::FILE_EXTENSION);
         self.download_release(&url, file_name)?;
 
@@ -134,7 +133,13 @@ impl GithubClient {
         self.release_helper(release)
     }
 
-    /// Fetches all available tags (releases) from bitcoins repository
+    /// Fetches all available tags (releases) from bitcoins repository.
+    ///
+    /// # BUG
+    /// FIXME: It turns out that not all tags are releases.. Not sure
+    /// if there is way to return a Page<T> of releases. I may need to use
+    /// the raw github api and build the functionality myself, as octocrab
+    /// does not seem to support it.
     ///
     /// # Example
     /// ```no_run

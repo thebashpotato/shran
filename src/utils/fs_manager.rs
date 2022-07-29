@@ -1,7 +1,7 @@
-use super::{ShranDefault, ShranFile};
+use super::Token;
 use crate::error::ShranError;
+use crate::{ShranDefault, ShranFile};
 use serde_yaml;
-use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -42,15 +42,12 @@ impl FileSystemManager {
     /// Returns an io::Error of file creation fails, or file writing
     /// fails
     ///
-    /// Retuns a yaml serialization error if the HashMap cannot
-    /// be serialized
+    /// Retuns a yaml serialization error if Token cannot be serialized
     pub fn write_token(&self, token: String) -> Result<(), Box<dyn Error>> {
         if !Path::new(self.gh_token_file.as_str()).exists() {
             File::create(self.gh_token_file.as_str())?;
         }
-        let mut map: HashMap<&str, &str> = HashMap::new();
-        let _ = map.insert("token", token.as_str());
-        let yaml_string = serde_yaml::to_string(&map)?;
+        let yaml_string = serde_yaml::to_string(&Token::new(&token))?;
         fs::write(self.gh_token_file.as_str(), yaml_string)?;
 
         Ok(())
@@ -64,8 +61,11 @@ impl FileSystemManager {
     /// Returns ShranError::GithubTokenNotFoundError if gh.yaml file
     /// is not found on disk.
     ///
-    /// Returns ShranError::GithubTokenReadError if deserialzing the yaml
-    /// fails.
+    /// Retuns a yaml deserialization error if Token cannot be deserialized,
+    /// if this happens, it likely means the user has tampered with, or intentionally
+    /// messed up the file structre.
+    ///
+    /// TODO: Write tests to mimic file tampering
     ///
     /// There are possibillities for std lib fs errors being thrown,
     /// which is why the error handling is dispatched dynamically instead
@@ -80,19 +80,7 @@ impl FileSystemManager {
             }));
         }
         let yaml = fs::read_to_string(&self.gh_token_file)?;
-        let deserialized: HashMap<String, String> = serde_yaml::from_str(&yaml)?;
-        match deserialized.get("token") {
-            Some(t) => {
-                return Ok(t.to_owned());
-            }
-            None => {
-                return Err(Box::new(ShranError::GithubTokenReadError {
-                    msg: format!("Failed deserializing {}", &self.gh_token_file),
-                    file: file!(),
-                    line: line!(),
-                    column: column!(),
-                }));
-            }
-        }
+        let deserialized_token: Token = serde_yaml::from_str(&yaml)?;
+        Ok(deserialized_token.extract_token())
     }
 }

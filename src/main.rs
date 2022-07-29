@@ -3,14 +3,16 @@ mod config;
 mod error;
 mod github;
 mod strategies;
+mod utils;
 
 pub use cli::commands::{ActiveCommand, ArgName, SubCommandName};
 pub use cli::Cli;
-pub use config::{FileSystemManager, ShranDefault, ShranFile};
+pub use config::{ShranDefault, ShranFile};
 pub use error::ShranError;
 pub use github::{GitRelease, GithubClient};
 use std::process::ExitCode;
 pub use strategies::bitcoin::{BuildOptionName, BuildStrategy, OptionEnabled};
+pub use utils::FileSystemManager;
 
 fn run_generate(node_type: &String) {
     println!("Generating build for: {}", node_type);
