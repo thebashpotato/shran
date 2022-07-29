@@ -10,9 +10,6 @@ use std::path::Path;
 /// A wrapper around the built in filesystem utilites.
 /// Manages writing, reading, and updating files and directories
 /// which shran relies on.
-///
-/// # Example
-///
 pub struct FileSystemManager {
     gh_token_file: String,
 }
@@ -22,6 +19,9 @@ impl FileSystemManager {
     /// will be checked for existance (config, cache, build), if they do not exist,
     /// they will be created. Note that only the directories will be created, not
     /// the files that live inside them.
+    ///
+    /// # Errors
+    /// Returns an io::Error if creating the directories fails
     pub fn new() -> std::io::Result<Self> {
         if !Path::new(ShranDefault::config_dir().as_str()).exists() {
             fs::create_dir(ShranDefault::config_dir())?;
@@ -35,7 +35,15 @@ impl FileSystemManager {
     }
 
     /// Writes the users github token to a yaml file.
-    /// Will trample the previous contents
+    /// Will trample the previous contents of the file.
+    ///
+    /// # Errors
+    ///
+    /// Returns an io::Error of file creation fails, or file writing
+    /// fails
+    ///
+    /// Retuns a yaml serialization error if the HashMap cannot
+    /// be serialized
     pub fn write_token(&self, token: String) -> Result<(), Box<dyn Error>> {
         if !Path::new(self.gh_token_file.as_str()).exists() {
             File::create(self.gh_token_file.as_str())?;
@@ -48,7 +56,20 @@ impl FileSystemManager {
         Ok(())
     }
 
-    /// Read the token from disk
+    /// Read the token from disk, returns a moved String object
+    /// containing said token for github authentication purposes
+    ///
+    /// # Errors
+    ///
+    /// Returns ShranError::GithubTokenNotFoundError if gh.yaml file
+    /// is not found on disk.
+    ///
+    /// Returns ShranError::GithubTokenReadError if deserialzing the yaml
+    /// fails.
+    ///
+    /// There are possibillities for std lib fs errors being thrown,
+    /// which is why the error handling is dispatched dynamically instead
+    /// of statically.
     pub fn read_token(&self) -> Result<String, Box<dyn Error>> {
         if !Path::new(&self.gh_token_file).exists() {
             return Err(Box::new(ShranError::GithubTokenNotFoundError {

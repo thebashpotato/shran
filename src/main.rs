@@ -30,7 +30,7 @@ fn run_auth(token: &String) -> Result<(), Box<dyn std::error::Error>> {
 async fn run_get_latest() -> Result<GitRelease, Box<dyn std::error::Error>> {
     let fs = FileSystemManager::new()?;
     let token = fs.read_token()?;
-    let gclient = GithubClient::new(token.to_owned())?;
+    let gclient = GithubClient::new(token)?;
     let release: GitRelease = gclient.get_latest_release().await?;
     Ok(release)
 }
@@ -38,7 +38,7 @@ async fn run_get_latest() -> Result<GitRelease, Box<dyn std::error::Error>> {
 async fn run_get_tagged_release(tag: String) -> Result<GitRelease, Box<dyn std::error::Error>> {
     let fs = FileSystemManager::new()?;
     let token = fs.read_token()?;
-    let gclient = GithubClient::new(token.to_owned())?;
+    let gclient = GithubClient::new(token)?;
     let release: GitRelease = gclient.get_tagged_release(&tag).await?;
     Ok(release)
 }
