@@ -1,7 +1,7 @@
 use super::{ShranDefault, ShranFile};
 use crate::error::ShranError;
 use serde_yaml;
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -40,8 +40,8 @@ impl FileSystemManager {
         if !Path::new(self.gh_token_file.as_str()).exists() {
             File::create(self.gh_token_file.as_str())?;
         }
-        let mut map: BTreeMap<&str, &str> = BTreeMap::new();
-        map.insert("token", token.as_str());
+        let mut map: HashMap<&str, &str> = HashMap::new();
+        let _ = map.insert("token", token.as_str());
         let yaml_string = serde_yaml::to_string(&map)?;
         fs::write(self.gh_token_file.as_str(), yaml_string)?;
 
@@ -59,7 +59,7 @@ impl FileSystemManager {
             }));
         }
         let yaml = fs::read_to_string(&self.gh_token_file)?;
-        let deserialized: BTreeMap<String, String> = serde_yaml::from_str(&yaml)?;
+        let deserialized: HashMap<String, String> = serde_yaml::from_str(&yaml)?;
         match deserialized.get("token") {
             Some(t) => {
                 return Ok(t.to_owned());
