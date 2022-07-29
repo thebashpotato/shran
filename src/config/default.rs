@@ -4,7 +4,7 @@ pub enum ShranFile {
     GhToken,
     BitcoinBuildLog,
     BitcoinBuildConfig,
-    BuildCache,
+    LocalDownloads,
 }
 
 pub struct ShranDefault;
@@ -16,8 +16,9 @@ impl<'a> ShranDefault {
     pub const BUILD_LOG_FILENAME: &'a str = "build.log";
     pub const BITCOIN_BASE_URL: &'a str = "https://github.com/bitcoin/bitcoin/archive/refs/tags";
     pub const FILE_EXTENSION: &'a str = ".tar.gz";
+    pub const LOCAL_DOWNLOADS_FILENAME: &'a str = "downloads.yaml";
 
-    #[inline]
+    #[inline(always)]
     pub fn config_dir() -> String {
         if let Ok(xdg) = env::var("XDG_CONFIG_HOME") {
             return format!("{}/{}", xdg, Self::PROGNAME);
@@ -25,12 +26,12 @@ impl<'a> ShranDefault {
         format!("{}/.config/{}", env::var("HOME").unwrap(), Self::PROGNAME)
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn cache_dir() -> String {
         format!("{}/.cache/{}", env::var("HOME").unwrap(), Self::PROGNAME)
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn build_dir() -> String {
         if let Ok(here) = env::current_dir() {
             return String::from(here.to_str().unwrap());
@@ -38,7 +39,7 @@ impl<'a> ShranDefault {
         String::from(env::current_dir().unwrap().to_str().unwrap())
     }
 
-    #[inline]
+    #[inline(never)]
     pub fn forfile(file: ShranFile) -> String {
         match file {
             ShranFile::GhToken => {
@@ -50,7 +51,9 @@ impl<'a> ShranDefault {
             ShranFile::BitcoinBuildConfig => {
                 format!("{}/{}", Self::build_dir(), Self::BUILD_CONFIG_FILENAME)
             }
-            ShranFile::BuildCache => Self::cache_dir(),
+            ShranFile::LocalDownloads => {
+                format!("{}/{}", Self::config_dir(), Self::LOCAL_DOWNLOADS_FILENAME)
+            }
         }
     }
 }

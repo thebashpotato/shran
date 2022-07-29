@@ -1,6 +1,22 @@
-///! This module defines all command helpers
+use std::default::Default;
+use std::fmt;
 
 /// All accepted subcommands that the shran cli accepts are
+///
+/// # Details
+///
+/// * auth
+///     - currently only supports a github token
+///
+/// * build
+///     - requires a path to a relavant build template
+///
+/// * fetch
+///     - supports listing all bitcoin versions, download the latest version, and downloading a
+///       specified version
+///
+/// * generate
+///     - create a build template which conforms to bitcoins automake build system
 #[derive(Debug)]
 pub struct SubCommandName;
 
@@ -8,6 +24,7 @@ impl<'c> SubCommandName {
     pub const GENERATE: &'c str = "generate";
     pub const BUILD: &'c str = "build";
     pub const AUTH: &'c str = "auth";
+    pub const FETCH: &'c str = "fetch";
 }
 
 /// Each subcommand will have associated arguments that go with it
@@ -21,20 +38,62 @@ impl<'c> ArgName {
     pub const STRATEGY: &'c str = "strategy";
     // Args for SubCommandName::AUTH
     pub const TOKEN: &'c str = "token";
+    // Args for SubCommandName::FETCH
+    pub const LIST_REMOTE: &'c str = "listremote";
+    pub const LIST_LOCAL: &'c str = "listlocal";
+    pub const LATEST: &'c str = "latest";
+    pub const TAG: &'c str = "tag";
 }
 
-/// Returns the user specified command and the argument that goes with it
-#[derive(Debug)]
+/// Helps distinguish betweem arguments that have values,
+/// and arguments that don't.
+#[derive(Debug, Clone)]
+pub struct Argument {
+    pub value: Option<String>,
+    pub name: String,
+}
+
+impl Default for Argument {
+    fn default() -> Self {
+        Self {
+            value: None,
+            name: String::from(""),
+        }
+    }
+}
+
+impl fmt::Display for Argument {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+        match self.value.clone() {
+            Some(val) => {
+                write!(f, "Argument Name: {}\nValue: {}", self.name, val,)
+            }
+            None => {
+                write!(f, "Argument Name: {}\nValue: None", self.name,)
+            }
+        }
+    }
+}
+
+/// Returns the user specified command and the argument
+/// structure that goes with it.
+#[derive(Debug, Clone)]
 pub struct ActiveCommand {
     sub_command: String,
-    arg: String,
+    arg: Argument,
+}
+
+impl fmt::Display for ActiveCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Subcommand Name: {}\n{}", self.sub_command, self.arg)
+    }
 }
 
 impl ActiveCommand {
-    pub fn new(sub_command: &str, arg: &str) -> Self {
+    pub fn new(sub_command: &str, arg: Argument) -> Self {
         Self {
             sub_command: String::from(sub_command),
-            arg: String::from(arg),
+            arg,
         }
     }
 
@@ -42,7 +101,7 @@ impl ActiveCommand {
         &self.sub_command
     }
 
-    pub fn arg(&self) -> &String {
-        &self.arg
+    pub fn arg(&self) -> Argument {
+        self.arg.clone()
     }
 }

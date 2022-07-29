@@ -1,9 +1,7 @@
 <div align="center">
   <img src="assets/shran.jpg">
 </div>
-
 <br>
-
 <div align="center">
   <a href="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml">
     <img src="https://github.com/mattcoding4days/Shran/actions/workflows/rust.yml/badge.svg?branch=dev"/>
@@ -39,7 +37,7 @@ cargo build
 cargo test
 
 # Run the debug version
-./target/debug/shran --help
+./target/debug/shran help
 ```
 
 ### :superhero_man: Features
@@ -49,7 +47,8 @@ cargo test
 #### Current planned features
 
   * [x] cli design
-  * [ ] Github Api integration
+  * [x] Github Api integration
+  * [x] Bitcoin version management
   * [ ] Github action integration
   * [ ] Vanilla and Custom builds supported through a yaml file
 
@@ -68,10 +67,11 @@ OPTIONS:
     -V, --version    Print version information
 
 SUBCOMMANDS:
-    -A, auth        Authorize shran access to a github via the api
-    -B, build       Execute a compilation strategy
-    -G, generate    Generate a build configuration for a specified proof of work blockchain
-    help            Print this message or the help of the given subcommand(s)
+    auth -A        Authorize shran access to a github via the api
+    build -B       Execute a compilation strategy
+    fetch -F       List, download and manage bitcoin source code from github and on your local machine
+    generate -G    Generate a build configuration for a specified proof of work blockchain
+    help           Print this message or the help of the given subcommand(s)
 ```
 
 ### :scroll: Documentation ( Not complete )

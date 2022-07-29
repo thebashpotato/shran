@@ -4,6 +4,7 @@ use curl::easy::Easy;
 use octocrab::models::repos::{Release, Tag};
 use octocrab::{Octocrab, Page};
 use std::error::Error;
+use std::fmt;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -16,6 +17,27 @@ pub struct GitRelease {
     pub tag_name: String,
     pub release_branch: String,
     pub published_at: Option<DateTime<Utc>>,
+}
+
+impl fmt::Display for GitRelease {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+        match self.published_at {
+            Some(time) => {
+                write!(
+                    f,
+                    "Author: {}\nTag: {}\nRelease Branch: {}\n Published: {}",
+                    self.author, self.tag_name, self.release_branch, time,
+                )
+            }
+            None => {
+                write!(
+                    f,
+                    "Author: {}\nTag: {}\nRelease Branch: {}\n Published: Unknown",
+                    self.author, self.tag_name, self.release_branch,
+                )
+            }
+        }
+    }
 }
 
 /// A wrapper around around curl and Octocrab, GithubClient exposes
