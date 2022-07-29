@@ -64,14 +64,10 @@ impl Default for Argument {
 
 impl fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
-        match self.value.clone() {
-            Some(val) => {
-                write!(f, "Argument Name: {}\nValue: {}", self.name, val,)
-            }
-            None => {
-                write!(f, "Argument Name: {}\nValue: None", self.name,)
-            }
+        if let Some(val) = self.value.clone() {
+            return write!(f, "Argument Name: {}\nValue: {}", self.name, val,);
         }
+        write!(f, "Argument Name: {}\nValue: None", self.name,)
     }
 }
 

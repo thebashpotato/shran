@@ -37,13 +37,12 @@ async fn run_get_tagged_release(token: &String) -> Result<GitRelease, Box<dyn st
     Ok(release)
 }
 
-async fn run_get_all_available_tags(token: &String) -> Result<(), Box<dyn std::error::Error>> {
+async fn run_get_all_available_tags(
+    token: &String,
+) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let gclient = GithubClient::new(token.to_owned())?;
     let tags: Vec<String> = gclient.get_all_tags().await?;
-    for tag in tags {
-        println!("{}", tag);
-    }
-    Ok(())
+    Ok(tags)
 }
 
 #[tokio::main]
@@ -51,22 +50,18 @@ async fn main() -> ExitCode {
     let mut exit_code = ExitCode::SUCCESS;
     match Cli::new() {
         Ok(cli) => {
+            dbg!("{}", &cli);
             if cli.subcommand_auth() {
-                println!("Running auth\n{}", cli.args());
                 run_auth(&cli.args().value.unwrap());
             }
 
             if cli.subcommand_build() {
-                println!("Running build\n{}", cli.args());
                 run_build(&cli.args().value.unwrap());
             }
 
-            if cli.subcommand_fetch() {
-                println!("Running fetch\n{}", cli.args());
-            }
+            if cli.subcommand_fetch() {}
 
             if cli.subcommand_generate() {
-                println!("Running generate\n{}", cli.args());
                 run_generate(&cli.args().name)
             }
         }

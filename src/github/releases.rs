@@ -21,22 +21,18 @@ pub struct GitRelease {
 
 impl fmt::Display for GitRelease {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
-        match self.published_at {
-            Some(time) => {
-                write!(
-                    f,
-                    "Author: {}\nTag: {}\nRelease Branch: {}\n Published: {}",
-                    self.author, self.tag_name, self.release_branch, time,
-                )
-            }
-            None => {
-                write!(
-                    f,
-                    "Author: {}\nTag: {}\nRelease Branch: {}\n Published: Unknown",
-                    self.author, self.tag_name, self.release_branch,
-                )
-            }
+        if let Some(time) = self.published_at {
+            return write!(
+                f,
+                "Author: {}\nTag: {}\nRelease Branch: {}\n Published: {}",
+                self.author, self.tag_name, self.release_branch, time,
+            );
         }
+        write!(
+            f,
+            "Author: {}\nTag: {}\nRelease Branch: {}\n Published: Unknown",
+            self.author, self.tag_name, self.release_branch,
+        )
     }
 }
 

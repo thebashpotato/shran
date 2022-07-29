@@ -2,6 +2,7 @@ use super::commands::{ActiveCommand, ArgName, Argument, SubCommandName};
 use crate::error::ShranError;
 use clap::{crate_authors, crate_description, crate_name, crate_version, Arg, ArgMatches, Command};
 use std::error::Error;
+use std::fmt;
 use std::path::Path;
 
 /// Wrapper around the clap command line interface library.
@@ -18,6 +19,12 @@ use std::path::Path;
 #[derive(Debug)]
 pub struct Cli {
     active_command: ActiveCommand,
+}
+
+impl fmt::Display for Cli {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.active_command)
+    }
 }
 
 impl<'e> Cli {
