@@ -16,4 +16,18 @@ pub enum ShranError<'e> {
         line: u32,
         column: u32,
     },
+    #[error("Error: {msg:?}\nFile: {file:?} [{line:?}:{column:?}]")]
+    GithubTokenNotFoundError {
+        msg: String,
+        file: &'e str,
+        line: u32,
+        column: u32,
+    },
+    #[error("Error: {msg:?}\nFile: {file:?} [{line:?}:{column:?}]")]
+    GithubTokenReadError {
+        msg: String,
+        file: &'e str,
+        line: u32,
+        column: u32,
+    },
 }

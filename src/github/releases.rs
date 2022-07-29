@@ -24,13 +24,13 @@ impl fmt::Display for GitRelease {
         if let Some(time) = self.published_at {
             return write!(
                 f,
-                "Author: {}\nTag: {}\nRelease Branch: {}\n Published: {}",
+                "Author: {}\nTag: {}\nRelease Branch: {}\nPublished: {}",
                 self.author, self.tag_name, self.release_branch, time,
             );
         }
         write!(
             f,
-            "Author: {}\nTag: {}\nRelease Branch: {}\n Published: Unknown",
+            "Author: {}\nTag: {}\nRelease Branch: {}\nPublished: Unknown",
             self.author, self.tag_name, self.release_branch,
         )
     }
