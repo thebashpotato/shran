@@ -2,13 +2,13 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Used to easily read and write github auth information
-/// to disk in yaml format.
+/// to disk in yaml format. Currently only supports a token
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct Token {
+pub struct GithubAuth {
     github_authentication: HashMap<String, String>,
 }
 
-impl Token {
+impl GithubAuth {
     /// Build a serializable/deserializable Token structure
     pub fn new(token: &String) -> Self {
         let mut github_authentication = HashMap::new();

@@ -1,4 +1,4 @@
-use super::Token;
+use super::GithubAuth;
 use crate::error::ShranError;
 use crate::{ShranDefault, ShranFile};
 use serde_yaml;
@@ -47,7 +47,7 @@ impl FileSystemManager {
         if !Path::new(self.gh_token_file.as_str()).exists() {
             File::create(self.gh_token_file.as_str())?;
         }
-        let yaml_string = serde_yaml::to_string(&Token::new(&token))?;
+        let yaml_string = serde_yaml::to_string(&GithubAuth::new(&token))?;
         fs::write(self.gh_token_file.as_str(), yaml_string)?;
 
         Ok(())
@@ -80,7 +80,7 @@ impl FileSystemManager {
             }));
         }
         let yaml = fs::read_to_string(&self.gh_token_file)?;
-        let deserialized_token: Token = serde_yaml::from_str(&yaml)?;
-        Ok(deserialized_token.extract_token())
+        let deserialized: GithubAuth = serde_yaml::from_str(&yaml)?;
+        Ok(deserialized.extract_token())
     }
 }
