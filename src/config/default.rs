@@ -4,7 +4,7 @@ pub enum ShranFile {
     GhToken,
     BitcoinBuildLog,
     BitcoinBuildConfig,
-    LocalDownloads,
+    DownloadManifest,
 }
 
 pub struct ShranDefault;
@@ -16,7 +16,8 @@ impl<'a> ShranDefault {
     pub const BUILD_LOG_FILENAME: &'a str = "build.log";
     pub const BITCOIN_BASE_URL: &'a str = "https://github.com/bitcoin/bitcoin/archive/refs/tags";
     pub const FILE_EXTENSION: &'a str = ".tar.gz";
-    pub const LOCAL_DOWNLOADS_FILENAME: &'a str = "downloads.yaml";
+    pub const DOWNLOAD_MANIFEST_FILENAME: &'a str = "manifest.yaml";
+    pub const SUPPORTED_BLOCKCHAINS: &'a [&'a str] = &["bitcoin"];
 
     #[inline(always)]
     pub fn config_dir() -> String {
@@ -51,8 +52,12 @@ impl<'a> ShranDefault {
             ShranFile::BitcoinBuildConfig => {
                 format!("{}/{}", Self::build_dir(), Self::BUILD_CONFIG_FILENAME)
             }
-            ShranFile::LocalDownloads => {
-                format!("{}/{}", Self::config_dir(), Self::LOCAL_DOWNLOADS_FILENAME)
+            ShranFile::DownloadManifest => {
+                format!(
+                    "{}/{}",
+                    Self::config_dir(),
+                    Self::DOWNLOAD_MANIFEST_FILENAME
+                )
             }
         }
     }

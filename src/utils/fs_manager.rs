@@ -5,7 +5,14 @@ use serde_yaml;
 use std::error::Error;
 use std::fs;
 use std::fs::File;
+use std::io::prelude::Write;
 use std::path::Path;
+
+/// Enumeration which will tell reading/writing functions
+/// where to save uncompressed source trees.
+pub enum BlockchainKind {
+    Bitcoin,
+}
 
 /// A wrapper around the built in filesystem utilites.
 /// Manages writing, reading, and updating files and directories
@@ -28,6 +35,14 @@ impl FileSystemManager {
         }
         if !Path::new(ShranDefault::cache_dir().as_str()).exists() {
             fs::create_dir(ShranDefault::cache_dir())?;
+        }
+
+        // create download cache directories for all supported blockchians
+        for blockchain in ShranDefault::SUPPORTED_BLOCKCHAINS {
+            let path = format!("{}/{}", ShranDefault::cache_dir(), *blockchain);
+            if !Path::new(path.as_str()).exists() {
+                fs::create_dir(path)?;
+            }
         }
         Ok(Self {
             gh_token_file: ShranDefault::forfile(ShranFile::GhToken),
@@ -82,5 +97,43 @@ impl FileSystemManager {
         let yaml = fs::read_to_string(&self.gh_token_file)?;
         let deserialized: GithubAuth = serde_yaml::from_str(&yaml)?;
         Ok(deserialized.extract_token())
+    }
+
+    /// This function takes a file and a destination byte array
+    /// and writes it's content to disk as a tar.gz file. the 3rd argument
+    /// is for specifying which blockchain directory the archive file
+    /// to be stored to, this is for future proofing support of different blockchains.
+    /// After the archive is downloaded it is manually extracted.
+    ///
+    /// # Errors
+    ///
+    /// Returns ShranError::BlockchainVersionAlreadyExistsError if the archive has
+    /// already been downloaded
+    pub fn write_and_extract_blockchain_archive(
+        &self,
+        filename: &str,
+        destination: Vec<u8>,
+        blockchain_kind: BlockchainKind,
+    ) -> Result<(), Box<dyn Error>> {
+        match blockchain_kind {
+            BlockchainKind::Bitcoin => {
+                let abs_path: String =
+                    format!("{}/bitcoin/{}", ShranDefault::cache_dir(), filename);
+                if Path::new(abs_path.as_str()).exists() {
+                    return Err(Box::new(ShranError::BlockchainVersionAlreadyExistsError {
+                        msg: format!("{} already exists", abs_path),
+                        file: file!(),
+                        line: line!(),
+                        column: column!(),
+                    }));
+                }
+                // Here after writing the compressed file to disk, we need
+                // to extract the contents, and add all meta data
+                // to the manifest manager.
+                let mut file = File::create(abs_path)?;
+                file.write_all(destination.as_slice())?;
+            }
+        }
+        Ok(())
     }
 }

@@ -30,4 +30,11 @@ pub enum ShranError<'e> {
         line: u32,
         column: u32,
     },
+    #[error("Error: {msg:?}\nFile: {file:?} [{line:?}:{column:?}]")]
+    BlockchainVersionAlreadyExistsError {
+        msg: String,
+        file: &'e str,
+        line: u32,
+        column: u32,
+    },
 }

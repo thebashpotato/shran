@@ -1,12 +1,11 @@
 use crate::config::ShranDefault;
+use crate::utils::{BlockchainKind, FileSystemManager};
 use chrono::{DateTime, Utc};
 use curl::easy::Easy;
 use octocrab::models::repos::{Release, Tag};
 use octocrab::{Octocrab, Page};
 use std::error::Error;
 use std::fmt;
-use std::fs::File;
-use std::io::prelude::*;
 
 /// Reprents all necessary information about a github repositories
 /// release information, most of this information is taken from
@@ -44,33 +43,37 @@ impl fmt::Display for GitRelease {
 pub struct GithubClient {
     octocrab: Octocrab,
     easy: Easy,
+    fs: FileSystemManager,
 }
 
 impl GithubClient {
     pub fn new(token: String) -> Result<Self, Box<dyn std::error::Error>> {
         let octocrab = Octocrab::builder().personal_token(token).build()?;
         let easy: Easy = Easy::new();
+        let fs = FileSystemManager::new()?;
 
-        Ok(Self { octocrab, easy })
+        Ok(Self { octocrab, easy, fs })
     }
 
-    fn download_release(mut self, url: &String, file_name: String) -> std::io::Result<()> {
-        let mut dst: Vec<u8> = Vec::new();
+    fn download_release(mut self, url: &String, file_name: String) -> Result<(), Box<dyn Error>> {
+        let mut destination: Vec<u8> = Vec::new();
         self.easy.url(url)?;
         self.easy.follow_location(true)?;
 
         {
             let mut transfer = self.easy.transfer();
             transfer.write_function(|data| {
-                dst.extend_from_slice(data);
+                destination.extend_from_slice(data);
                 Ok(data.len())
             })?;
             transfer.perform()?;
         }
         {
-            // TODO: User FileSystemManager struct here
-            let mut file = File::create(file_name)?;
-            file.write_all(dst.as_slice())?;
+            self.fs.write_and_extract_blockchain_archive(
+                &file_name,
+                destination,
+                BlockchainKind::Bitcoin,
+            )?;
         }
         Ok(())
     }

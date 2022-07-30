@@ -58,7 +58,6 @@ async fn main() -> ExitCode {
     let mut exit_code = ExitCode::SUCCESS;
     match Cli::new() {
         Ok(cli) => {
-            dbg!("{}", &cli);
             if cli.subcommand_auth() {
                 if let Err(e) = run_auth(&cli.args().value.unwrap()) {
                     eprintln!("{}", e);

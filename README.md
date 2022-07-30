@@ -19,11 +19,13 @@
 
 ### :information_source: Automate Bitcoin builds, speed up deployment
 
-  [Shran](https://memory-alpha.fandom.com/wiki/Thy%27lek_Shran) is an open-source cli tool being developed to address the needs of [DMG Blockchain Solutions](https://dmgblockchain.com/).
-  It supports build configurations through a yaml file. Customizing a Bitcoin node with
+  [Shran](https://memory-alpha.fandom.com/wiki/Thy%27lek_Shran) is an open-source cli tool being
+  developed to address the difficulty and confusion around compiling, configuring and deploying a bitcoin node (or similar blockchain source code).
+  It supports build configurations through a yaml file, allowing customization of a Bitcoin node with
   your own .so libraries, while avoiding the need to deal directly with the automake build system
   is made extremely simple. It's so easy, your dev ops team with no C++ experience can carry out builds,
-  tests, and deployments.
+  tests, and deployments. A wide set of default common [node](node) configurations can be called from the command line with out
+  the need for a yaml configuration file.
 
 ### :building_construction: Development
 
@@ -49,8 +51,10 @@ cargo test
   * [x] cli design
   * [x] Github Api integration
   * [x] Bitcoin version management
+  * [ ] Automake compilation automation and configuration
+  * [ ] Various different sytles of bitcoin node builds available (wallet node, rpc node, develpment node)
   * [ ] Github action integration
-  * [ ] Vanilla and Custom builds supported through a yaml file
+  * [ ] Highly custom builds supported through a yaml file
 
 ### :keyboard: Usage ( Not complete )
 

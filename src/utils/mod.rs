@@ -1,4 +1,4 @@
-pub use fs_manager::FileSystemManager;
+pub use fs_manager::{BlockchainKind, FileSystemManager};
 pub use misc_serde::GithubAuth;
 
 pub mod fs_manager;
