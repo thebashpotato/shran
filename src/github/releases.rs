@@ -56,14 +56,14 @@ impl GithubClient {
     }
 
     fn download_release(mut self, url: &String, file_name: String) -> Result<(), Box<dyn Error>> {
-        let mut destination: Vec<u8> = Vec::new();
+        let mut file_bytes: Vec<u8> = Vec::new();
         self.easy.url(url)?;
         self.easy.follow_location(true)?;
 
         {
             let mut transfer = self.easy.transfer();
             transfer.write_function(|data| {
-                destination.extend_from_slice(data);
+                file_bytes.extend_from_slice(data);
                 Ok(data.len())
             })?;
             transfer.perform()?;
@@ -71,7 +71,7 @@ impl GithubClient {
         {
             self.fs.write_and_extract_blockchain_archive(
                 &file_name,
-                destination,
+                file_bytes,
                 BlockchainKind::Bitcoin,
             )?;
         }

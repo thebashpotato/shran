@@ -1,3 +1,4 @@
+use super::archive::{Archiver, TapeArchive};
 use super::GithubAuth;
 use crate::error::ShranError;
 use crate::{ShranDefault, ShranFile};
@@ -112,28 +113,29 @@ impl FileSystemManager {
     pub fn write_and_extract_blockchain_archive(
         &self,
         filename: &str,
-        destination: Vec<u8>,
+        file_bytes: Vec<u8>,
         blockchain_kind: BlockchainKind,
     ) -> Result<(), Box<dyn Error>> {
         match blockchain_kind {
             BlockchainKind::Bitcoin => {
-                let abs_path: String =
-                    format!("{}/bitcoin/{}", ShranDefault::cache_dir(), filename);
-                if Path::new(abs_path.as_str()).exists() {
+                let abs_dir = format!("{}/bitcoin", ShranDefault::cache_dir());
+                let archive_file_path = format!("{}/{}", abs_dir, filename);
+                if Path::new(archive_file_path.as_str()).exists() {
                     return Err(Box::new(ShranError::BlockchainVersionAlreadyExistsError {
-                        msg: format!("{} already exists", abs_path),
+                        msg: format!("{} already exists", archive_file_path),
                         file: file!(),
                         line: line!(),
                         column: column!(),
                     }));
                 }
-                // Here after writing the compressed file to disk, we need
-                // to extract the contents, and add all meta data
-                // to the manifest manager.
-                let mut file = File::create(abs_path)?;
-                file.write_all(destination.as_slice())?;
+                // write the archive file to disk
+                let mut file = File::create(&archive_file_path)?;
+                file.write_all(file_bytes.as_slice())?;
+                // deflate and extract the archive
+                TapeArchive::new(archive_file_path.as_str(), abs_dir.as_str()).unpack()?;
             }
         }
+
         Ok(())
     }
 }
