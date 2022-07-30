@@ -39,7 +39,7 @@ impl<'archive> TapeArchive<'archive> {
 impl<'archive> Archiver<()> for TapeArchive<'archive> {
     fn unpack(&self) -> Result<(), Box<dyn Error>> {
         let file: File = File::open(&self.archive)?;
-        let tar = GzDecoder::new(file);
+        let tar: GzDecoder<File> = GzDecoder::new(file);
         tar::Archive::new(tar).unpack(&self.destination_dir)?;
         Ok(())
     }
