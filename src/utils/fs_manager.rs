@@ -100,16 +100,23 @@ impl FileSystemManager {
         Ok(deserialized.extract_token())
     }
 
-    /// This function takes a file and a destination byte array
-    /// and writes it's content to disk as a tar.gz file. the 3rd argument
-    /// is for specifying which blockchain directory the archive file
-    /// to be stored to, this is for future proofing support of different blockchains.
-    /// After the archive is downloaded it is manually extracted.
+    /// This function writes an archive file to disk for a specified blockchain
+    /// to the `~/.cache/shran/<BlockchainKind>` directory, then extracts the contents,
+    /// and removes the archive file when it is done.
+    ///
+    /// # Parms
+    ///
+    /// 1. filename: name of the file with no path attached
+    /// 2. file_bytes: The actual contents of the file as bytes
+    /// 3. BlockchainKind: Enum representing the blockchain type (bitcoin, litecoin etc..)
     ///
     /// # Errors
     ///
     /// Returns ShranError::BlockchainVersionAlreadyExistsError if the archive has
     /// already been downloaded
+    ///
+    /// Returns a variety of fs module errors if file creation fails, or if removing
+    /// the archive file afterwards fails
     pub fn write_and_extract_blockchain_archive(
         &self,
         filename: &str,
@@ -133,9 +140,10 @@ impl FileSystemManager {
                 file.write_all(file_bytes.as_slice())?;
                 // deflate and extract the archive
                 TapeArchive::new(archive_file_path.as_str(), abs_dir.as_str()).unpack()?;
+                // remove the archive file as we no longer require it
+                fs::remove_file(archive_file_path)?;
             }
         }
-
         Ok(())
     }
 }

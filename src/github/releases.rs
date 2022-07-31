@@ -38,8 +38,6 @@ impl fmt::Display for GitRelease {
 /// A wrapper around around curl and Octocrab, GithubClient exposes
 /// only the necessary functionality to search, verify and download
 /// releases of specified Proof-of-Work Nodes, most notably bitcoin.
-///
-/// # Example
 pub struct GithubClient {
     octocrab: Octocrab,
     easy: Easy,
