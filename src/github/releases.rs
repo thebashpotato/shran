@@ -1,6 +1,6 @@
 use crate::config::ShranDefault;
 use crate::utils::{BlockchainKind, FileSystemManager};
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use curl::easy::Easy;
 use octocrab::models::repos::{Release, Tag};
 use octocrab::{Octocrab, Page};
@@ -12,25 +12,19 @@ use std::fmt;
 /// the similar but much larger octocrab Release struct
 #[derive(Debug)]
 pub struct GitRelease {
+    pub name: String,
     pub author: String,
     pub tag_name: String,
     pub release_branch: String,
-    pub published_at: Option<DateTime<Utc>>,
+    pub published_at: String,
 }
 
 impl fmt::Display for GitRelease {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
-        if let Some(time) = self.published_at {
-            return write!(
-                f,
-                "Author: {}\nTag: {}\nRelease Branch: {}\nPublished: {}",
-                self.author, self.tag_name, self.release_branch, time,
-            );
-        }
         write!(
             f,
-            "Author: {}\nTag: {}\nRelease Branch: {}\nPublished: Unknown",
-            self.author, self.tag_name, self.release_branch,
+            "Name: {}\nAuthor: {}\nTag: {}\nRelease Branch: {}\nPublished: {}",
+            self.name, self.author, self.tag_name, self.release_branch, self.published_at,
         )
     }
 }
@@ -88,10 +82,11 @@ impl GithubClient {
         self.download_release(&url, file_name)?;
 
         Ok(GitRelease {
+            name: release.name.unwrap_or("None".to_string()),
             author: release.author.login,
             tag_name: release.tag_name,
             release_branch: release.target_commitish,
-            published_at: release.published_at,
+            published_at: release.published_at.unwrap_or(Utc::now()).to_string(),
         })
     }
 

@@ -12,7 +12,7 @@ pub use error::ShranError;
 pub use github::{GitRelease, GithubClient};
 use std::process::ExitCode;
 pub use strategies::bitcoin::{BuildOptionName, BuildStrategy, OptionEnabled};
-pub use utils::FileSystemManager;
+pub use utils::{FileSystemManager, ManifestManager};
 
 fn run_generate(node_type: &String) {
     println!("Generating build for: {}", node_type);

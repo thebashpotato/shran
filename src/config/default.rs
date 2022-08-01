@@ -4,7 +4,7 @@ pub enum ShranFile {
     GhToken,
     BitcoinBuildLog,
     BitcoinBuildConfig,
-    DownloadManifest,
+    ManifestFile,
 }
 
 pub struct ShranDefault;
@@ -52,7 +52,7 @@ impl<'a> ShranDefault {
             ShranFile::BitcoinBuildConfig => {
                 format!("{}/{}", Self::build_dir(), Self::BUILD_CONFIG_FILENAME)
             }
-            ShranFile::DownloadManifest => {
+            ShranFile::ManifestFile => {
                 format!(
                     "{}/{}",
                     Self::config_dir(),
