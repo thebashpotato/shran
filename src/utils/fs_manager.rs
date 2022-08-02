@@ -35,10 +35,10 @@ impl FileSystemManager {
     /// Returns an io::Error if creating the directories fails
     pub fn new() -> std::io::Result<Self> {
         if !Path::new(ShranDefault::config_dir().as_str()).exists() {
-            fs::create_dir(ShranDefault::config_dir())?;
+            fs::create_dir_all(ShranDefault::config_dir())?;
         }
         if !Path::new(ShranDefault::cache_dir().as_str()).exists() {
-            fs::create_dir(ShranDefault::cache_dir())?;
+            fs::create_dir_all(ShranDefault::cache_dir())?;
         }
 
         // create download cache directories for all supported blockchians
@@ -54,6 +54,7 @@ impl FileSystemManager {
         if !Path::new(&manifest_file).exists() {
             fs::File::create(&manifest_file)?;
         }
+
         let gh_token_file = ShranDefault::forfile(ShranFile::GhToken);
         if !Path::new(&gh_token_file).exists() {
             fs::File::create(&gh_token_file)?;
