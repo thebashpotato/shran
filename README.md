@@ -24,7 +24,7 @@
   It supports build configurations through a yaml file, allowing customization of a Bitcoin node with
   your own .so libraries, while avoiding the need to deal directly with the automake build system
   is made extremely simple. It's so easy, your dev ops team with no C++ experience can carry out builds,
-  tests, and deployments. A wide set of default common [node](node) configurations can be called from the command line with out
+  tests, and deployments. A wide set of default common node configurations can be called from the command line with out
   the need for a yaml configuration file.
 
 ### :building_construction: Development
