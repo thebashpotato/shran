@@ -1,12 +1,8 @@
 use crate::FileSystemManager;
 use crate::ShranError;
-use crate::{ShranDefault, ShranFile};
 use serde::{Deserialize, Serialize};
-use serde_yaml;
 use std::collections::HashMap;
 use std::error::Error;
-use std::fs;
-use std::path::Path;
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
 pub struct ManifestEntry {
@@ -42,17 +38,7 @@ impl ManifestManager {
     ///
     pub fn new() -> Result<Self, Box<dyn Error>> {
         let fs = FileSystemManager::new()?;
-
-        let manifest_file = ShranDefault::forfile(ShranFile::ManifestFile);
-        if !Path::new(&manifest_file).exists() {
-            fs::File::create(&manifest_file)?;
-        }
-        // load entries here
-        let yaml = fs::read_to_string(&manifest_file)?;
-        let mut entries: Manifest = HashMap::new();
-        if !yaml.is_empty() {
-            entries = serde_yaml::from_str(&yaml)?;
-        }
+        let entries: Manifest = fs.read_manifest()?;
 
         Ok(Self { entries, fs })
     }
