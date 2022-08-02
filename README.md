@@ -35,8 +35,8 @@
 # Compile the source
 cargo build
 
-# Run the tests
-cargo test
+# Run the tests (they need to be ran in order, so specify a single thread)
+cargo test -- --test-threads 1
 
 # Run the debug version
 ./target/debug/shran help

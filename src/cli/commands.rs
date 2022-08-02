@@ -39,8 +39,8 @@ impl<'c> ArgName {
     // Args for SubCommandName::AUTH
     pub const TOKEN: &'c str = "token";
     // Args for SubCommandName::FETCH
-    pub const LIST_REMOTE: &'c str = "listremote";
-    pub const LIST_LOCAL: &'c str = "listlocal";
+    pub const LIST_REMOTE: &'c str = "list_remote";
+    pub const LIST_LOCAL: &'c str = "list_local";
     pub const LATEST: &'c str = "latest";
     pub const TAG: &'c str = "tag";
 }

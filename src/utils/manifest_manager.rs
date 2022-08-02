@@ -1,3 +1,4 @@
+use crate::FileSystemManager;
 use crate::ShranError;
 use crate::{ShranDefault, ShranFile};
 use serde::{Deserialize, Serialize};
@@ -28,8 +29,8 @@ pub type BlockchainDescription = String;
 pub type Manifest = HashMap<BlockchainDescription, ManifestEntry>;
 
 pub struct ManifestManager {
-    manifest_file: String,
     entries: Manifest,
+    fs: FileSystemManager,
 }
 
 impl ManifestManager {
@@ -40,6 +41,8 @@ impl ManifestManager {
     /// yaml Errors, and std lib io Errors can be returned
     ///
     pub fn new() -> Result<Self, Box<dyn Error>> {
+        let fs = FileSystemManager::new()?;
+
         let manifest_file = ShranDefault::forfile(ShranFile::ManifestFile);
         if !Path::new(&manifest_file).exists() {
             fs::File::create(&manifest_file)?;
@@ -51,10 +54,7 @@ impl ManifestManager {
             entries = serde_yaml::from_str(&yaml)?;
         }
 
-        Ok(Self {
-            manifest_file,
-            entries,
-        })
+        Ok(Self { entries, fs })
     }
 
     /// Returns the length of the internal Manifest entries hash map
@@ -79,8 +79,7 @@ impl ManifestManager {
         if !self.entries.contains_key(&key) {
             self.entries.insert(key, entry.to_owned());
             // write the updated manifest to disk
-            let entries_string = serde_yaml::to_string(&self.entries)?;
-            fs::write(self.manifest_file.as_str(), entries_string)?;
+            self.fs.write_manifest(&self.entries)?;
             return Ok(());
         }
         Err(Box::new(ShranError::ManifestEntryError {
@@ -97,24 +96,23 @@ impl ManifestManager {
     /// 1. key: The full description of the blockchain [e.g.] Bitcoin core v21.0
     ///
     /// # Errors
-    /// Can throw std lib io Errors, or ShranError::ManifestEntry
+    /// ShranError::ManifestEntry, or ShranError::FileSystemError
     pub fn remove_entry(
         &mut self,
         key: BlockchainDescription,
-    ) -> Result<ManifestEntry, Box<dyn Error>> {
+    ) -> Result<ManifestEntry, ShranError<'static>> {
         if self.entries.contains_key(&key) {
             if let Some(entry) = self.entries.remove(&key) {
-                let entries_string = serde_yaml::to_string(&self.entries)?;
-                fs::write(self.manifest_file.as_str(), entries_string)?;
+                self.fs.write_manifest(&self.entries)?;
                 return Ok(entry);
             }
         }
-        Err(Box::new(ShranError::ManifestEntryError {
+        Err(ShranError::ManifestEntryError {
             msg: format!("{} does not exist in manifest file", key),
             file: file!(),
             line: line!(),
             column: column!(),
-        }))
+        })
     }
 
     /// Get an refrence to an entry from the manifest.yaml file,
@@ -123,20 +121,20 @@ impl ManifestManager {
     /// 1. key: The full description of the blockchain [e.g.] Bitcoin core v21.0
     ///
     /// # Errors
-    /// Can throw std lib io Errors, or ShranError::ManifestEntry
-    pub fn get_entry(&self, key: BlockchainDescription) -> Result<&ManifestEntry, Box<dyn Error>> {
+    /// ShranError::ManifestEntryError
+    pub fn get_entry(&self, key: BlockchainDescription) -> Result<&ManifestEntry, ShranError> {
         if self.entries.contains_key(&key) {
             if let Some(entry) = self.entries.get(&key) {
                 return Ok(entry);
             }
         }
 
-        Err(Box::new(ShranError::ManifestEntryError {
+        Err(ShranError::ManifestEntryError {
             msg: format!("{} does not exist in manifest file", key),
             file: file!(),
             line: line!(),
             column: column!(),
-        }))
+        })
     }
 }
 

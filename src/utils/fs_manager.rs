@@ -1,8 +1,10 @@
 use super::archive::{Archiver, TapeArchive};
+use super::manifest_manager::Manifest;
 use super::GithubAuth;
 use crate::error::ShranError;
 use crate::{ShranDefault, ShranFile};
 use serde_yaml;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -20,6 +22,7 @@ pub enum BlockchainKind {
 /// which shran relies on.
 pub struct FileSystemManager {
     gh_token_file: String,
+    manifest_file: String,
 }
 
 impl FileSystemManager {
@@ -45,8 +48,20 @@ impl FileSystemManager {
                 fs::create_dir(path)?;
             }
         }
+
+        // create all files
+        let manifest_file = ShranDefault::forfile(ShranFile::ManifestFile);
+        if !Path::new(&manifest_file).exists() {
+            fs::File::create(&manifest_file)?;
+        }
+        let gh_token_file = ShranDefault::forfile(ShranFile::GhToken);
+        if !Path::new(&gh_token_file).exists() {
+            fs::File::create(&gh_token_file)?;
+        }
+
         Ok(Self {
-            gh_token_file: ShranDefault::forfile(ShranFile::GhToken),
+            gh_token_file,
+            manifest_file,
         })
     }
 
@@ -88,7 +103,7 @@ impl FileSystemManager {
     /// of statically.
     pub fn read_token(&self) -> Result<String, Box<dyn Error>> {
         if !Path::new(&self.gh_token_file).exists() {
-            return Err(Box::new(ShranError::GithubTokenNotFoundError {
+            return Err(Box::new(ShranError::FileSystemError {
                 msg: format!("{} not found", &self.gh_token_file),
                 file: file!(),
                 line: line!(),
@@ -128,7 +143,7 @@ impl FileSystemManager {
                 let abs_dir = format!("{}/bitcoin", ShranDefault::cache_dir());
                 let archive_file_path = format!("{}/{}", abs_dir, filename);
                 if Path::new(archive_file_path.as_str()).exists() {
-                    return Err(Box::new(ShranError::BlockchainVersionAlreadyExistsError {
+                    return Err(Box::new(ShranError::FileSystemError {
                         msg: format!("{} already exists", archive_file_path),
                         file: file!(),
                         line: line!(),
@@ -145,5 +160,69 @@ impl FileSystemManager {
             }
         }
         Ok(())
+    }
+
+    /// Reads the manifest file from disk, if the file is empty, and empty
+    /// Manifest object is returned, if the file is not empty, the yaml is
+    /// deserialized into the Manifest object and returned.
+    ///
+    /// # Errors
+    ///
+    /// Returns ShranError::FileSystemError if any io errors occur,
+    /// or if any serde_yaml errors occur.
+    pub fn read_manifest(&self) -> Result<Manifest, ShranError<'static>> {
+        match fs::read_to_string(&self.manifest_file) {
+            Ok(yaml) => {
+                let mut entries: Manifest = HashMap::new();
+                if !yaml.is_empty() {
+                    match serde_yaml::from_str(&yaml) {
+                        Ok(deserialized_entries) => {
+                            entries = deserialized_entries;
+                        }
+                        Err(e) => {
+                            return Err(ShranError::FileSystemError {
+                                msg: format!("{}", e),
+                                file: file!(),
+                                line: line!(),
+                                column: column!(),
+                            });
+                        }
+                    }
+                }
+                return Ok(entries);
+            }
+            Err(e) => {
+                return Err(ShranError::FileSystemError {
+                    msg: format!("{}", e),
+                    file: file!(),
+                    line: line!(),
+                    column: column!(),
+                });
+            }
+        }
+    }
+
+    pub fn write_manifest(&self, entries: &Manifest) -> Result<(), ShranError<'static>> {
+        match serde_yaml::to_string(&entries) {
+            Ok(serialized_manifest) => {
+                if let Err(e) = fs::write(self.manifest_file.as_str(), serialized_manifest) {
+                    return Err(ShranError::FileSystemError {
+                        msg: format!("{}", e),
+                        file: file!(),
+                        line: line!(),
+                        column: column!(),
+                    });
+                }
+            }
+            Err(e) => {
+                return Err(ShranError::FileSystemError {
+                    msg: format!("{}", e),
+                    file: file!(),
+                    line: line!(),
+                    column: column!(),
+                });
+            }
+        }
+        return Ok(());
     }
 }
