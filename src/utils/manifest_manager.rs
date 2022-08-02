@@ -61,19 +61,19 @@ impl ManifestManager {
         &mut self,
         key: BlockchainDescription,
         entry: &ManifestEntry,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<(), ShranError<'static>> {
         if !self.entries.contains_key(&key) {
             self.entries.insert(key, entry.to_owned());
             // write the updated manifest to disk
             self.fs.write_manifest(&self.entries)?;
             return Ok(());
         }
-        Err(Box::new(ShranError::ManifestEntryError {
+        Err(ShranError::ManifestEntryError {
             msg: format!("{} aleady exists in manifest file", key),
             file: file!(),
             line: line!(),
             column: column!(),
-        }))
+        })
     }
 
     /// Removes an entry to the manfist.yaml file
